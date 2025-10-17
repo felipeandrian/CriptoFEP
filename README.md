@@ -78,11 +78,15 @@ This is the complete list of algorithms currently supported by CriptoFEP.
 | **Caesar**         |      No       | The classic shift cipher (fixed shift of 3).                               |
 | **Caesar Box**     |      Yes      | A simple columnar transposition where columns are read in natural order.   |
 | **Columnar**       |      Yes      | A transposition cipher that rearranges text in columns based on a keyword. |
+| **Digrafid**       |      Yes      | An advanced fractionating cipher operating on digraphs with a 25x25 grid.  |
 | **Double Columnar**|      Yes      | Applies the Columnar Transposition cipher twice for enhanced security.     |
 | **Four-Square**    |      Yes      | A polygraphic cipher using four 5x5 grids to encrypt digraphs.             |
 | **Keyboard Shift** |      No       | A substitution cipher based on shifting keys on a QWERTY keyboard.         |
+| **Morbit**         |      No       | A fractionating cipher that combines Morse code with a simple 3x3 grid.    |
 | **Multiplicative** |      Yes      | A mathematical substitution cipher using `(ax) mod 26`.                    |
+| **Nihilist**       |      Yes      | A superencipherment combining a Polybius square with a key addition.       |
 | **Playfair**       |      Yes      | The first practical polygraphic substitution cipher, using one 5x5 grid.   |
+| **Pollux**         |      Yes      | A homophonic cipher that disguises Morse code using a numeric key.         |
 | **Rail Fence**     |      Yes      | A transposition cipher that writes text in a zig-zag pattern.              |
 | **Redefence**      |      Yes      | A route cipher that writes text column-by-column and reads row-by-row.     |
 | **ROT13**          |      No       | A Caesar cipher with a fixed shift of 13.                                  |
