@@ -48,6 +48,11 @@ use CriptoFEP::Columnar qw(columnar_encrypt columnar_decrypt);
 use CriptoFEP::DoubleColumnar qw(double_columnar_encrypt double_columnar_decrypt);
 use CriptoFEP::AMSCO qw(amsco_encrypt amsco_decrypt);
 use CriptoFEP::CaesarBox qw(caesar_box_encrypt caesar_box_decrypt);
+use CriptoFEP::Bifid qw(bifid_encrypt bifid_decrypt);
+use CriptoFEP::Trifid qw(trifid_encrypt trifid_decrypt);
+use CriptoFEP::TwoSquare qw(two_square_encrypt two_square_decrypt);
+use CriptoFEP::ThreeSquare qw(three_square_encrypt three_square_decrypt);
+use CriptoFEP::FourSquare qw(four_square_encrypt four_square_decrypt);
 # Encodings
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -80,9 +85,14 @@ my %ciphers = (
 	'multiplicative' => { encrypt => \&multiplicative_encrypt, decrypt => \&multiplicative_decrypt, needs_key => 1, info => \&CriptoFEP::Multiplicative::info }, 
 	'keyboardshift'  => { encrypt => \&keyboard_shift_encrypt, decrypt => \&keyboard_shift_decrypt, needs_key => 0, info => \&CriptoFEP::KeyboardShift::info },
 	'columnar' => { encrypt => \&columnar_encrypt, decrypt => \&columnar_decrypt, needs_key => 1, info => \&CriptoFEP::Columnar::info }, 
-	'doublecolumnar' => { encrypt => \&double_columnar_encrypt, decrypt => \&double_columnar_decrypt, needs_key => 1, info => \&CriptoFEP::DoubleColumnar::info }, 
+	'doublecolumnar' => { encrypt => \&double_columnar_encrypt, decrypt => \&double_columnar_decrypt, needs_key => 1, info => \&CriptoFEP::DoubleColumnar::info },
 	'amsco' => { encrypt => \&amsco_encrypt, decrypt => \&amsco_decrypt, needs_key => 1, info => \&CriptoFEP::AMSCO::info }, 
 	'caesarbox'      => { encrypt => \&caesar_box_encrypt,      decrypt => \&caesar_box_decrypt,      needs_key => 1, info => \&CriptoFEP::CaesarBox::info }, 
+	'bifid'     => { encrypt => \&bifid_encrypt,      decrypt => \&bifid_decrypt,      needs_key => 1, info => \&CriptoFEP::Bifid::info },
+	'trifid'    => { encrypt => \&trifid_encrypt,     decrypt => \&trifid_decrypt,     needs_key => 1, info => \&CriptoFEP::Trifid::info },
+	'twosquare' => { encrypt => \&two_square_encrypt, decrypt => \&two_square_decrypt, needs_key => 1, info => \&CriptoFEP::TwoSquare::info },
+	'threesquare' => { encrypt => \&three_square_encrypt, decrypt => \&three_square_decrypt, needs_key => 1, info => \&CriptoFEP::ThreeSquare::info },
+	'foursquare' => { encrypt => \&four_square_encrypt, decrypt => \&four_square_decrypt, needs_key => 1, info => \&CriptoFEP::FourSquare::info  },
 );
 # --- ENCODING DATA STRUCTURE ---
 my %encodings = (
@@ -138,7 +148,8 @@ OPTIONS
 
     CIPHER-SPECIFIC KEYS:
       -k, --key <KEY>            Provide the primary secret key.
-      -k2, --key2 <KEY>          Provide the second key (for 'doublecolumnar').
+      -k2, --key2 <KEY>          Provide the second key (for 'doublecolumnar', 'twosquare', 'foursquare').
+      -k3, --key3 <KEY>          Provide the third key (for 'threesquare').
       --grid-key <KEY>           Provide the grid generation key (for 'adfgx', 'adfgvx').
       --pattern-key <PATTERN>    Provide the pattern key (for 'amsco', e.g., "1221").
 
@@ -172,7 +183,7 @@ AVAILABLE CIPHERS
 
 # --- MAIN LOGIC ---
 # Declare variables that will be populated by GetOptions.
-my ($cipher_name, $encrypt_flag, $decrypt_flag, $key_input, $key2_input, $grid_key_input, $pattern_key_input);
+my ($cipher_name, $encrypt_flag, $decrypt_flag, $key_input, $key2_input, $key3_input, $grid_key_input, $pattern_key_input);
 my ($mapping_name, $encode_flag, $decode_flag);
 my ($file_in, $file_out, $show_help, $info_flag);
 
@@ -183,6 +194,7 @@ GetOptions(
     'd|decrypt'    => \$decrypt_flag,
     'k|key=s'      => \$key_input,
 	'k2|key2=s'    => \$key2_input, 
+	'k3|key3=s'    => \$key3_input,
     'grid-key=s'   => \$grid_key_input,
 	'pattern-key=s'=> \$pattern_key_input,
     'm|mapping=s'  => \$mapping_name,
@@ -259,25 +271,32 @@ if ($cipher_name) {
     $final_result = $function_ref->($text_input, [$key_input, $pattern_key_input]);
     $command_info .= ", Key: \"$key_input\", Pattern: \"$pattern_key_input\"";
 	}
-	elsif ($cipher_name eq 'doublecolumnar') {
-    die "ERROR: The 'doublecolumnar' cipher requires a primary key (-k) and a second key (--key2).\n" 
+	elsif ($cipher_name eq 'doublecolumnar' || $cipher_name eq 'twosquare' || $cipher_name eq 'foursquare') {
+    die "ERROR: The '$cipher_name' cipher requires a primary key (-k) and a second key (--key2).\n" 
         unless defined $key_input && defined $key2_input;
     # Passamos as duas chaves como uma referência a um array
     $final_result = $function_ref->($text_input, [$key_input, $key2_input]);
     $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\"";
 	}
     elsif ($cipher_name eq 'adfgvx' || $cipher_name eq 'adfgx' ) {
-        die "ERROR: The 'adfgvx' or 'adfgx' cipher requires a transposition key (-k) and a grid key (--grid-key).\n" unless defined $key_input && defined $grid_key_input;
+        die "ERROR: The '$cipher_name' cipher requires a transposition key (-k) and a grid key (--grid-key).\n" unless defined $key_input && defined $grid_key_input;
         $final_result = $function_ref->($text_input, [$grid_key_input, $key_input]);
         $command_info .= ", Transposition Key: \"$key_input\", Grid Key: \"$grid_key_input\"";
     }
+	elsif ($cipher_name eq 'threesquare') {
+    die "ERROR: The 'threesquare' cipher requires three keys (-k, -k2, -k3).\n" 
+        unless defined $key_input && defined $key2_input && defined $key3_input;
+    
+    $final_result = $function_ref->($text_input, [$key_input, $key2_input, $key3_input]);
+    $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\", Key 3: \"$key3_input\"";
+	}
 	# General handling for all other ciphers that need a single key
     elsif ($cipher_info->{needs_key}) {
         die "ERROR: The '$cipher_name' cipher requires a key (-k).\n" unless defined $key_input;
         # Specific key validations
         if ($cipher_name eq 'railfence' || $cipher_name eq 'caesarbox') {
             unless ($key_input =~ /^\d+$/ && $key_input > 1) {
-                die "ERROR: The key for 'railfence' or 'caesarbox' must be an integer greater than 1.\n";
+                die "ERROR: The key for '$cipher_name' must be an integer greater than 1.\n";
             }
         }
         elsif ($cipher_name eq 'affine') {
