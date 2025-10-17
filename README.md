@@ -84,15 +84,19 @@ This is the complete list of algorithms currently supported by CriptoFEP.
 | **Multiplicative** |      Yes      | A mathematical substitution cipher using `(ax) mod 26`.                    |
 | **Playfair**       |      Yes      | The first practical polygraphic substitution cipher, using one 5x5 grid.   |
 | **Rail Fence**     |      Yes      | A transposition cipher that writes text in a zig-zag pattern.              |
+| **Redefence**      |      Yes      | A route cipher that writes text column-by-column and reads row-by-row.     |
 | **ROT13**          |      No       | A Caesar cipher with a fixed shift of 13.                                  |
 | **ROT47**          |      No       | A Caesar cipher that shifts all printable ASCII characters.                |
+| **Route**          |   	Yes	     | A transposition cipher that writes text in a clockwise inward spiral path. |
 | **Scytale**        |      No       | An ancient transposition cipher simulating a cylinder (fixed at 5 rows).   |
+| **Skip**           |      Yes      | A simple transposition equivalent to a Caesar Box or basic Columnar.       |
 | **Three-Square**   |      Yes      | A polygraphic cipher using three 5x5 grids.                                |
 | **Trifid**         |      Yes      | An advanced fractionating cipher using a 3x3x3 cube.                       |
+| **Turning Grille** |      No       | A transposition cipher using a rotating stencil with a fixed 6x6 grid.     |
 | **Two-Square**     |      Yes      | A polygraphic cipher using two 5x5 grids.                                  |
-| **Unicode Shift**  |      Yes      | A Caesar-like shift that works on any Unicode character, including emojis. |
 | **Vigenère**       |      Yes      | A polyalphabetic cipher using a keyword (Autokey variant).                 |
 | **XOR**            |      Yes      | A modern, bitwise symmetric cipher.                                        |
+
 
 ### Encodings (Standard, keyless mappings for representation)
 

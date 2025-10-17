@@ -53,6 +53,10 @@ use CriptoFEP::Trifid qw(trifid_encrypt trifid_decrypt);
 use CriptoFEP::TwoSquare qw(two_square_encrypt two_square_decrypt);
 use CriptoFEP::ThreeSquare qw(three_square_encrypt three_square_decrypt);
 use CriptoFEP::FourSquare qw(four_square_encrypt four_square_decrypt);
+use CriptoFEP::Redefence qw(redefence_encrypt redefence_decrypt);
+use CriptoFEP::Route qw(route_encrypt route_decrypt);
+use CriptoFEP::Skip qw(skip_encrypt skip_decrypt);
+use CriptoFEP::TurningGrille qw(turning_grille_encrypt turning_grille_decrypt);
 # Encodings
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -93,6 +97,10 @@ my %ciphers = (
 	'twosquare' => { encrypt => \&two_square_encrypt, decrypt => \&two_square_decrypt, needs_key => 1, info => \&CriptoFEP::TwoSquare::info },
 	'threesquare' => { encrypt => \&three_square_encrypt, decrypt => \&three_square_decrypt, needs_key => 1, info => \&CriptoFEP::ThreeSquare::info },
 	'foursquare' => { encrypt => \&four_square_encrypt, decrypt => \&four_square_decrypt, needs_key => 1, info => \&CriptoFEP::FourSquare::info  },
+	'redefence' => { encrypt => \&redefence_encrypt,  decrypt => \&redefence_decrypt,  needs_key => 1, info => \&CriptoFEP::Redefence::info },
+	'route'     => { encrypt => \&route_encrypt,      decrypt => \&route_decrypt,      needs_key => 1, info => \&CriptoFEP::Route::info },
+	'skip'      => { encrypt => \&skip_encrypt,       decrypt => \&skip_decrypt,       needs_key => 1, info => \&CriptoFEP::Skip::info },
+	'turninggrille' => { encrypt => \&turning_grille_encrypt, decrypt => \&turning_grille_decrypt, needs_key => 0, info => \&CriptoFEP::TurningGrille::info },
 );
 # --- ENCODING DATA STRUCTURE ---
 my %encodings = (
@@ -294,7 +302,7 @@ if ($cipher_name) {
     elsif ($cipher_info->{needs_key}) {
         die "ERROR: The '$cipher_name' cipher requires a key (-k).\n" unless defined $key_input;
         # Specific key validations
-        if ($cipher_name eq 'railfence' || $cipher_name eq 'caesarbox') {
+        if ($cipher_name eq 'railfence' || $cipher_name eq 'caesarbox' || $cipher_name eq 'railfence' || $cipher_name eq 'route' || $cipher_name eq 'skip') {
             unless ($key_input =~ /^\d+$/ && $key_input > 1) {
                 die "ERROR: The key for '$cipher_name' must be an integer greater than 1.\n";
             }
