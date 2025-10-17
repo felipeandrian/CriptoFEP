@@ -48,7 +48,7 @@
 
 ## ✨ Core Features
 
-- **Extensive Library**: A vast collection of over 20 classic ciphers and 10+ standard encodings.
+- **Extensive Library**: A vast collection of over 30 classic ciphers and 10+ standard encodings.
 - **Dual Modes**: Intelligently separates **Ciphers** (for secrecy) from **Encodings** (for representation).
 - **Professional CLI**: A robust and intuitive command-line interface with clear, consistent options.
 - **File I/O**: Seamlessly encrypts/encodes direct text input or entire files, with output to the terminal or a new file.
