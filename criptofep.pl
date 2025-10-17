@@ -26,74 +26,74 @@ use Encode qw(decode);
 # Specify the 'lib' directory as a source for our custom modules.
 use lib 'lib';
 # Ciphers
-use CriptoFEP::Cesar qw(cesar_encrypt cesar_decrypt info);
-use CriptoFEP::Atbash qw(atbash_cipher info);
-use CriptoFEP::Atbah qw(atbah_cipher info);
-use CriptoFEP::Albam qw(albam_cipher info);
-use CriptoFEP::Scytale qw(scytale_encrypt scytale_decrypt info);
-use CriptoFEP::Polybius qw(polybius_encrypt polybius_decrypt info);
-use CriptoFEP::Rot13 qw(rot13_cipher info);
-use CriptoFEP::Rot47 qw(rot47_cipher info);
-use CriptoFEP::Bacon qw(bacon_encrypt bacon_decrypt info);
-use CriptoFEP::XOR qw(xor_encrypt xor_decrypt info);
-use CriptoFEP::Vigenere qw(vigenere_encrypt vigenere_decrypt info);
-use CriptoFEP::Playfair qw(playfair_encrypt playfair_decrypt info);
-use CriptoFEP::RailFence qw(rail_fence_encrypt rail_fence_decrypt info);
-use CriptoFEP::Affine qw(affine_encrypt affine_decrypt info);
-use CriptoFEP::ADFGX qw(adfgx_encrypt adfgx_decrypt info);
-use CriptoFEP::ADFGVX qw(adfgvx_encrypt adfgvx_decrypt info);
-use CriptoFEP::Multiplicative qw(multiplicative_encrypt multiplicative_decrypt info);
-use CriptoFEP::KeyboardShift qw(keyboard_shift_encrypt keyboard_shift_decrypt info);
-use CriptoFEP::Columnar qw(columnar_encrypt columnar_decrypt info); 
-use CriptoFEP::DoubleColumnar qw(double_columnar_encrypt double_columnar_decrypt info);
-use CriptoFEP::AMSCO qw(amsco_encrypt amsco_decrypt info);
-use CriptoFEP::CaesarBox qw(caesar_box_encrypt caesar_box_decrypt info);
+use CriptoFEP::Cesar qw(cesar_encrypt cesar_decrypt);
+use CriptoFEP::Atbash qw(atbash_cipher);
+use CriptoFEP::Atbah qw(atbah_cipher);
+use CriptoFEP::Albam qw(albam_cipher);
+use CriptoFEP::Scytale qw(scytale_encrypt scytale_decrypt);
+use CriptoFEP::Polybius qw(polybius_encrypt polybius_decrypt);
+use CriptoFEP::Rot13 qw(rot13_cipher);
+use CriptoFEP::Rot47 qw(rot47_cipher);
+use CriptoFEP::Bacon qw(bacon_encrypt bacon_decrypt);
+use CriptoFEP::XOR qw(xor_encrypt xor_decrypt);
+use CriptoFEP::Vigenere qw(vigenere_encrypt vigenere_decrypt);
+use CriptoFEP::Playfair qw(playfair_encrypt playfair_decrypt);
+use CriptoFEP::RailFence qw(rail_fence_encrypt rail_fence_decrypt);
+use CriptoFEP::Affine qw(affine_encrypt affine_decrypt);
+use CriptoFEP::ADFGX qw(adfgx_encrypt adfgx_decrypt);
+use CriptoFEP::ADFGVX qw(adfgvx_encrypt adfgvx_decrypt);
+use CriptoFEP::Multiplicative qw(multiplicative_encrypt multiplicative_decrypt);
+use CriptoFEP::KeyboardShift qw(keyboard_shift_encrypt keyboard_shift_decrypt);
+use CriptoFEP::Columnar qw(columnar_encrypt columnar_decrypt); 
+use CriptoFEP::DoubleColumnar qw(double_columnar_encrypt double_columnar_decrypt);
+use CriptoFEP::AMSCO qw(amsco_encrypt amsco_decrypt);
+use CriptoFEP::CaesarBox qw(caesar_box_encrypt caesar_box_decrypt);
 # Encodings
-use CriptoFEP::Morse qw(morse_encode morse_decode info);
-use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode info);
-use CriptoFEP::NATO qw(nato_encode nato_decode info);
-use CriptoFEP::TapCode qw(tap_code_encode tap_code_decode info);
-use CriptoFEP::Navajo qw(navajo_encode navajo_decode info);
-use CriptoFEP::AltCode qw(alt_code_encode alt_code_decode info);
-use CriptoFEP::T9 qw(t9_encode t9_decode info);
-use CriptoFEP::BrailleGS8 qw(braille_encode braille_decode info);
+use CriptoFEP::Morse qw(morse_encode morse_decode);
+use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
+use CriptoFEP::NATO qw(nato_encode nato_decode);
+use CriptoFEP::TapCode qw(tap_code_encode tap_code_decode);
+use CriptoFEP::Navajo qw(navajo_encode navajo_decode);
+use CriptoFEP::AltCode qw(alt_code_encode alt_code_decode);
+use CriptoFEP::T9 qw(t9_encode t9_decode);
+use CriptoFEP::BrailleGS8 qw(braille_encode braille_decode);
 
 # --- CIPHER DATA STRUCTURE ---
 # A hash of hashes that organizes all our ciphers and their functions.
 my %ciphers = (
-    'cesar' =>    { encrypt => \&cesar_encrypt,    decrypt => \&cesar_decrypt,    needs_key => 0, info => \&info },
-    'atbash' =>   { encrypt => \&atbash_cipher,    decrypt => \&atbash_cipher,    needs_key => 0, info => \&info },
-    'atbah' =>    { encrypt => \&atbah_cipher,     decrypt => \&atbah_cipher,     needs_key => 0, info => \&info },
-    'albam' =>    { encrypt => \&albam_cipher,     decrypt => \&albam_cipher,     needs_key => 0, info => \&info },
-    'scytale' =>  { encrypt => \&scytale_encrypt,  decrypt => \&scytale_decrypt,  needs_key => 0, info => \&info},
-    'polybius' => { encrypt => \&polybius_encrypt, decrypt => \&polybius_decrypt, needs_key => 0, info => \&info },
-    'rot13' =>    { encrypt => \&rot13_cipher,     decrypt => \&rot13_cipher,     needs_key => 0, info => \&info },
-    'rot47' =>    { encrypt => \&rot47_cipher,     decrypt => \&rot47_cipher,     needs_key => 0, info => \&info },
-    'bacon' =>    { encrypt => \&bacon_encrypt,    decrypt => \&bacon_decrypt,    needs_key => 0, info => \&info },
-    'xor' =>      { encrypt => \&xor_encrypt,      decrypt => \&xor_decrypt,      needs_key => 1, info => \&info },
-    'vigenere' => { encrypt => \&vigenere_encrypt, decrypt => \&vigenere_decrypt, needs_key => 1, info => \&info },
-    'playfair' => { encrypt => \&playfair_encrypt, decrypt => \&playfair_decrypt, needs_key => 1, info => \&info },
-    'railfence' => { encrypt => \&rail_fence_encrypt, decrypt => \&rail_fence_decrypt, needs_key => 1, info => \&info},
-    'affine' =>   { encrypt => \&affine_encrypt,   decrypt => \&affine_decrypt,   needs_key => 1, info => \&info },
-	'adfgx'     => { encrypt => \&adfgx_encrypt,    decrypt => \&adfgx_decrypt,    needs_key => 1, info => \&info }, 
-    'adfgvx' =>   { encrypt => \&adfgvx_encrypt,   decrypt => \&adfgvx_decrypt,   needs_key => 1, info => \&info },
-	'multiplicative' => { encrypt => \&multiplicative_encrypt, decrypt => \&multiplicative_decrypt, needs_key => 1, info => \&info }, 
-	'keyboardshift'  => { encrypt => \&keyboard_shift_encrypt, decrypt => \&keyboard_shift_decrypt, needs_key => 0, info => \&info },
-	'columnar' => { encrypt => \&columnar_encrypt, decrypt => \&columnar_decrypt, needs_key => 1, info => \&info }, 
-	'doublecolumnar' => { encrypt => \&double_columnar_encrypt, decrypt => \&double_columnar_decrypt, needs_key => 1, info => \&info }, 
-	'amsco' => { encrypt => \&amsco_encrypt, decrypt => \&amsco_decrypt, needs_key => 1, info => \&info }, 
-	'caesarbox'      => { encrypt => \&caesar_box_encrypt,      decrypt => \&caesar_box_decrypt,      needs_key => 1, info => \&info }, 
+    'cesar' =>    { encrypt => \&cesar_encrypt,    decrypt => \&cesar_decrypt,    needs_key => 0, , info => \&CriptoFEP::Cesar::info },
+    'atbash' =>   { encrypt => \&atbash_cipher,    decrypt => \&atbash_cipher,    needs_key => 0, , info => \&CriptoFEP::Atbash::info },
+    'atbah' =>    { encrypt => \&atbah_cipher,     decrypt => \&atbah_cipher,     needs_key => 0, , info => \&CriptoFEP::Atbah::info },
+    'albam' =>    { encrypt => \&albam_cipher,     decrypt => \&albam_cipher,     needs_key => 0, info => \&CriptoFEP::Albam::info },
+    'scytale' =>  { encrypt => \&scytale_encrypt,  decrypt => \&scytale_decrypt,  needs_key => 0, info => \&CriptoFEP::Scytale::info},
+    'polybius' => { encrypt => \&polybius_encrypt, decrypt => \&polybius_decrypt, needs_key => 0, info => \&CriptoFEP::Polybius::info },
+    'rot13' =>    { encrypt => \&rot13_cipher,     decrypt => \&rot13_cipher,     needs_key => 0, info => \&CriptoFEP::Rot13::info },
+    'rot47' =>    { encrypt => \&rot47_cipher,     decrypt => \&rot47_cipher,     needs_key => 0, info => \&CriptoFEP::Rot47::info },
+    'bacon' =>    { encrypt => \&bacon_encrypt,    decrypt => \&bacon_decrypt,    needs_key => 0, info => \&CriptoFEP::Bacon::info },
+    'xor' =>      { encrypt => \&xor_encrypt,      decrypt => \&xor_decrypt,      needs_key => 1, info => \&CriptoFEP::XOR::info },
+    'vigenere' => { encrypt => \&vigenere_encrypt, decrypt => \&vigenere_decrypt, needs_key => 1, info => \&CriptoFEP::Vigenere::info },
+    'playfair' => { encrypt => \&playfair_encrypt, decrypt => \&playfair_decrypt, needs_key => 1, info => \&CriptoFEP::Playfair::info },
+    'railfence' => { encrypt => \&rail_fence_encrypt, decrypt => \&rail_fence_decrypt, needs_key => 1, info => \&CriptoFEP::RailFence::info},
+    'affine' =>   { encrypt => \&affine_encrypt,   decrypt => \&affine_decrypt,   needs_key => 1, info => \&CriptoFEP::Affine::info },
+	'adfgx'     => { encrypt => \&adfgx_encrypt,    decrypt => \&adfgx_decrypt,    needs_key => 1, info => \&CriptoFEP::ADFGX::info }, 
+    'adfgvx' =>   { encrypt => \&adfgvx_encrypt,   decrypt => \&adfgvx_decrypt,   needs_key => 1, info => \&CriptoFEP::ADFGVX::info },
+	'multiplicative' => { encrypt => \&multiplicative_encrypt, decrypt => \&multiplicative_decrypt, needs_key => 1, info => \&CriptoFEP::Multiplicative::info }, 
+	'keyboardshift'  => { encrypt => \&keyboard_shift_encrypt, decrypt => \&keyboard_shift_decrypt, needs_key => 0, info => \&CriptoFEP::KeyboardShift::info },
+	'columnar' => { encrypt => \&columnar_encrypt, decrypt => \&columnar_decrypt, needs_key => 1, info => \&CriptoFEP::Columnar::info }, 
+	'doublecolumnar' => { encrypt => \&double_columnar_encrypt, decrypt => \&double_columnar_decrypt, needs_key => 1, info => \&CriptoFEP::DoubleColumnar::info }, 
+	'amsco' => { encrypt => \&amsco_encrypt, decrypt => \&amsco_decrypt, needs_key => 1, info => \&CriptoFEP::AMSCO::info }, 
+	'caesarbox'      => { encrypt => \&caesar_box_encrypt,      decrypt => \&caesar_box_decrypt,      needs_key => 1, info => \&CriptoFEP::CaesarBox::info }, 
 );
 # --- ENCODING DATA STRUCTURE ---
 my %encodings = (
-    'morse' => { encode => \&morse_encode, decode => \&morse_decode, info => \&info },
-    'a1z26' => { encode => \&a1z26_encode, decode => \&a1z26_decode, info => \&info },
-	'nato'  => { encode => \&nato_encode,  decode => \&nato_decode, info => \&info  },
-	'tapcode' => { encode => \&tap_code_encode,decode => \&tap_code_decode, info => \&info},
-	'navajo'  => { encode => \&navajo_encode,  decode => \&navajo_decode, info => \&info },
-	'altcode' => { encode => \&alt_code_encode,decode => \&alt_code_decode, info => \&info},
-	't9'      => { encode => \&t9_encode,      decode => \&t9_decode, info => \&info },
-	'braillegs8' => { encode => \&braille_encode, decode => \&braille_decode, info => \&info },
+    'morse' => { encode => \&morse_encode, decode => \&morse_decode, info => \&CriptoFEP::Morse::info },
+    'a1z26' => { encode => \&a1z26_encode, decode => \&a1z26_decode, info => \&CriptoFEP::A1Z26::info },
+	'nato'  => { encode => \&nato_encode,  decode => \&nato_decode, info => \&CriptoFEP::NATO::info  },
+	'tapcode' => { encode => \&tap_code_encode,decode => \&tap_code_decode, info => \&CriptoFEP::TapCode::info},
+	'navajo'  => { encode => \&navajo_encode,  decode => \&navajo_decode, info => \&CriptoFEP::Navajo::info },
+	'altcode' => { encode => \&alt_code_encode,decode => \&alt_code_decode, info => \&CriptoFEP::AltCode::info},
+	't9'      => { encode => \&t9_encode,      decode => \&t9_decode, info => \&CriptoFEP::T9::info },
+	'braillegs8' => { encode => \&braille_encode, decode => \&braille_decode, info => \&CriptoFEP::BrailleGS8::info }
 );
 
 
