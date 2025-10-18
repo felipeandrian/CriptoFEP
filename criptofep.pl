@@ -57,6 +57,7 @@ use CriptoFEP::Redefence qw(redefence_encrypt redefence_decrypt);
 use CriptoFEP::Route qw(route_encrypt route_decrypt);
 use CriptoFEP::Skip qw(skip_encrypt skip_decrypt);
 use CriptoFEP::TurningGrille qw(turning_grille_encrypt turning_grille_decrypt);
+use CriptoFEP::VIC qw(vic_encrypt vic_decrypt);
 # Encodings
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -66,6 +67,13 @@ use CriptoFEP::Navajo qw(navajo_encode navajo_decode);
 use CriptoFEP::AltCode qw(alt_code_encode alt_code_decode);
 use CriptoFEP::T9 qw(t9_encode t9_decode);
 use CriptoFEP::BrailleGS8 qw(braille_encode braille_decode);
+use CriptoFEP::Base32 qw(base32_encode base32_decode);
+use CriptoFEP::Base64 qw(base64_encode base64_decode);
+use CriptoFEP::Base16 qw(base16_encode base16_decode ); 
+use CriptoFEP::Base10 qw(base10_encode base10_decode );
+use CriptoFEP::Base8 qw(base8_encode base8_decode );
+use CriptoFEP::Base2 qw(base2_encode base2_decode );
+use CriptoFEP::UrlEncode qw(url_encode url_decode);
 
 # --- CIPHER DATA STRUCTURE ---
 # A hash of hashes that organizes all our ciphers and their functions.
@@ -101,6 +109,7 @@ my %ciphers = (
 	'route'     => { encrypt => \&route_encrypt,      decrypt => \&route_decrypt,      needs_key => 1, info => \&CriptoFEP::Route::info },
 	'skip'      => { encrypt => \&skip_encrypt,       decrypt => \&skip_decrypt,       needs_key => 1, info => \&CriptoFEP::Skip::info },
 	'turninggrille' => { encrypt => \&turning_grille_encrypt, decrypt => \&turning_grille_decrypt, needs_key => 0, info => \&CriptoFEP::TurningGrille::info },
+	'vic'           => { encrypt => \&vic_encrypt, decrypt => \&vic_decrypt, needs_key => 1, info => \&CriptoFEP::VIC::info },
 );
 # --- ENCODING DATA STRUCTURE ---
 my %encodings = (
@@ -111,7 +120,18 @@ my %encodings = (
 	'navajo'  => { encode => \&navajo_encode,  decode => \&navajo_decode, info => \&CriptoFEP::Navajo::info },
 	'altcode' => { encode => \&alt_code_encode,decode => \&alt_code_decode, info => \&CriptoFEP::AltCode::info},
 	't9'      => { encode => \&t9_encode,      decode => \&t9_decode, info => \&CriptoFEP::T9::info },
-	'braillegs8' => { encode => \&braille_encode, decode => \&braille_decode, info => \&CriptoFEP::BrailleGS8::info }
+	'braillegs8' => { encode => \&braille_encode, decode => \&braille_decode, info => \&CriptoFEP::BrailleGS8::info },
+	'base32'  => { encode => \&base32_encode, decode => \&base32_decode, info => \&CriptoFEP::Base32::info },
+	'base64'  => { encode => \&base64_encode, decode => \&base64_decode, info => \&CriptoFEP::Base64::info },
+	'base16'  => { encode => \&base16_encode, decode => \&base16_decode, info => \&CriptoFEP::Base16::info }, 
+	'base10'   => { encode => \&base10_encode,  decode => \&base10_decode, info => \&CriptoFEP::Base10::info }, 
+	'base8'   => { encode => \&base8_encode,  decode => \&base8_decode, info => \&CriptoFEP::Base8::info }, 
+	'base2'   => { encode => \&base2_encode,  decode => \&base2_decode, info => \&CriptoFEP::Base2::info }, 
+	'hexadecimal'  => { encode => \&base16_encode, decode => \&base16_decode, info => \&CriptoFEP::Base16::info }, 
+	'decimal'   => { encode => \&base10_encode,  decode => \&base10_decode, info => \&CriptoFEP::Base10::info }, 
+	'octal'   => { encode => \&base8_encode,  decode => \&base8_decode, info => \&CriptoFEP::Base8::info }, 
+	'binary'   => { encode => \&base2_encode,  decode => \&base2_decode, info => \&CriptoFEP::Base2::info },
+	'url'     => { encode => \&url_encode,  decode => \&url_decode, info => \&CriptoFEP::UrlEncode::info}, 
 );
 
 
@@ -160,6 +180,7 @@ OPTIONS
       -k3, --key3 <KEY>          Provide the third key (for 'threesquare').
       --grid-key <KEY>           Provide the grid generation key (for 'adfgx', 'adfgvx').
       --pattern-key <PATTERN>    Provide the pattern key (for 'amsco', e.g., "1221").
+      --date <DATE>              Provide the date (for 'vic' cipher).
 
 AVAILABLE CIPHERS
     ); # End of the first block of text
@@ -185,15 +206,19 @@ AVAILABLE CIPHERS
 	
     # Get information about the Caesar cipher
     perl $0 -c cesar --info
+	
+    # Encrypt using the complex VIC cipher
+    perl $0 -c vic -e -k \"A SIN TO SIN\" --date \"171025\" \"ATTACK AT DAWN\"
 
 );
 }
 
 # --- MAIN LOGIC ---
 # Declare variables that will be populated by GetOptions.
-my ($cipher_name, $encrypt_flag, $decrypt_flag, $key_input, $key2_input, $key3_input, $grid_key_input, $pattern_key_input);
+my ($cipher_name, $encrypt_flag, $decrypt_flag, $key_input, $key2_input, $key3_input, $grid_key_input, $pattern_key_input, $date_input);
 my ($mapping_name, $encode_flag, $decode_flag);
 my ($file_in, $file_out, $show_help, $info_flag);
+
 
 # Parse command-line arguments and populate the variables.
 GetOptions(
@@ -212,6 +237,7 @@ GetOptions(
     'in=s'         => \$file_in,
     'out=s'        => \$file_out,
     'h|help'       => \$show_help,
+    'date=s'          => \$date_input,     
 );
 
 # Display the banner.
@@ -279,6 +305,12 @@ if ($cipher_name) {
     $final_result = $function_ref->($text_input, [$key_input, $pattern_key_input]);
     $command_info .= ", Key: \"$key_input\", Pattern: \"$pattern_key_input\"";
 	}
+	elsif ($cipher_name eq 'vic') {
+        die "ERROR: The 'vic' cipher requires a phrase (-k) and a date (--date).\n" 
+            unless defined $key_input && defined $date_input;
+        $final_result = $function_ref->($text_input, [$key_input, $date_input]);
+        $command_info .= ", Phrase: \"$key_input\", Date: \"$date_input\"";
+    }
 	elsif ($cipher_name eq 'doublecolumnar' || $cipher_name eq 'twosquare' || $cipher_name eq 'foursquare') {
     die "ERROR: The '$cipher_name' cipher requires a primary key (-k) and a second key (--key2).\n" 
         unless defined $key_input && defined $key2_input;
