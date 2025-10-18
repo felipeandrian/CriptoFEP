@@ -57,7 +57,14 @@ use CriptoFEP::Redefence qw(redefence_encrypt redefence_decrypt);
 use CriptoFEP::Route qw(route_encrypt route_decrypt);
 use CriptoFEP::Skip qw(skip_encrypt skip_decrypt);
 use CriptoFEP::TurningGrille qw(turning_grille_encrypt turning_grille_decrypt);
+<<<<<<< HEAD
 use CriptoFEP::VIC qw(vic_encrypt vic_decrypt);
+=======
+use CriptoFEP::Pollux qw(pollux_encrypt pollux_decrypt);
+use CriptoFEP::Digrafid qw(digrafid_encrypt digrafid_decrypt);
+use CriptoFEP::Morbit qw(morbit_encrypt morbit_decrypt);
+use CriptoFEP::Nihilist qw(nihilist_encrypt nihilist_decrypt);
+>>>>>>> 7160b9d13a7ee9e9faaeefc671e130c284624ebd
 # Encodings
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -109,7 +116,14 @@ my %ciphers = (
 	'route'     => { encrypt => \&route_encrypt,      decrypt => \&route_decrypt,      needs_key => 1, info => \&CriptoFEP::Route::info },
 	'skip'      => { encrypt => \&skip_encrypt,       decrypt => \&skip_decrypt,       needs_key => 1, info => \&CriptoFEP::Skip::info },
 	'turninggrille' => { encrypt => \&turning_grille_encrypt, decrypt => \&turning_grille_decrypt, needs_key => 0, info => \&CriptoFEP::TurningGrille::info },
+<<<<<<< HEAD
 	'vic'           => { encrypt => \&vic_encrypt, decrypt => \&vic_decrypt, needs_key => 1, info => \&CriptoFEP::VIC::info },
+=======
+	'pollux' => { encrypt => \&pollux_encrypt, decrypt => \&pollux_decrypt, needs_key => 1, info => \&CriptoFEP::Pollux::info },
+	'digrafid' => { encrypt => \&digrafid_encrypt, decrypt => \&digrafid_decrypt, needs_key => 1, info => \&CriptoFEP::Digrafid::info },
+	'morbit'    => { encrypt => \&morbit_encrypt, decrypt => \&morbit_decrypt, needs_key => 0, info => \&CriptoFEP::Morbit::info },
+	'nihilist' => { encrypt => \&nihilist_encrypt, decrypt => \&nihilist_decrypt, needs_key => 1, info => \&CriptoFEP::Nihilist::info  },
+>>>>>>> 7160b9d13a7ee9e9faaeefc671e130c284624ebd
 );
 # --- ENCODING DATA STRUCTURE ---
 my %encodings = (
@@ -271,13 +285,13 @@ if ($cipher_name) {
     die "ERROR: You must specify an action: --encrypt (-e) or --decrypt (-d).\n" unless $encrypt_flag || $decrypt_flag;
     die "ERROR: --encrypt and --decrypt options cannot be used together.\n" if $encrypt_flag && $decrypt_flag;
     die "ERROR: Cipher '$cipher_name' is unknown.\n" unless exists $ciphers{$cipher_name};
-	
-	# Determine the action and the corresponding function reference from the dispatch table.
+    
+    # Determine the action and the corresponding function reference from the dispatch table.
     my $action = $encrypt_flag ? 'encrypt' : 'decrypt';
     my $cipher_info = $ciphers{$cipher_name};
     my $function_ref = $cipher_info->{$action};
 
-	# --- Get Input Text (from file or command line) ---
+    # --- Get Input Text (from file or command line) ---
     my $text_input;
     if (defined $file_in) {
         open my $fh, '<', $file_in or die "ERROR: Could not open input file '$file_in': $!\n";
@@ -287,14 +301,15 @@ if ($cipher_name) {
         $text_input = shift @ARGV;
     }
     die "ERROR: No input text provided.\n" unless defined $text_input;
-	
-	# Ensure command-line input is treated as UTF-8.
-	$text_input = decode('UTF-8', $text_input) unless defined $file_in;
     
-	# --- Execute Cipher ---
+    # Ensure command-line input is treated as UTF-8.
+    $text_input = decode('UTF-8', $text_input) unless defined $file_in;
+    
+    # --- Execute Cipher ---
     my $final_result;
     my $command_info = "Cipher: $cipher_name, Action: $action";
     
+<<<<<<< HEAD
 	# Special handling for ciphers requiring multiple, specific keys.
 	if ($cipher_name eq 'amsco') {
     die "ERROR: The 'amsco' cipher requires a primary key (-k) and a pattern key (--pattern-key).\n" 
@@ -320,20 +335,39 @@ if ($cipher_name) {
 	}
     elsif ($cipher_name eq 'adfgvx' || $cipher_name eq 'adfgx' ) {
         die "ERROR: The '$cipher_name' cipher requires a transposition key (-k) and a grid key (--grid-key).\n" unless defined $key_input && defined $grid_key_input;
+=======
+    # Special handling for ciphers requiring multiple, specific keys.
+    if ($cipher_name eq 'amsco') {
+        die "ERROR: The 'amsco' cipher requires a primary key (-k) and a pattern key (--pattern-key).\n" 
+            unless defined $key_input && defined $pattern_key_input;
+        die "ERROR: The pattern key for 'amsco' must only contain '1's and '2's.\n"
+            if $pattern_key_input =~ /[^12]/;
+        $final_result = $function_ref->($text_input, [$key_input, $pattern_key_input]);
+        $command_info .= ", Key: \"$key_input\", Pattern: \"$pattern_key_input\"";
+    }
+    elsif ($cipher_name eq 'doublecolumnar' || $cipher_name eq 'twosquare' || $cipher_name eq 'foursquare') {
+        die "ERROR: The '$cipher_name' cipher requires a primary key (-k) and a second key (--key2).\n" 
+            unless defined $key_input && defined $key2_input;
+        $final_result = $function_ref->($text_input, [$key_input, $key2_input]);
+        $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\"";
+    }
+    elsif ($cipher_name eq 'adfgvx' || $cipher_name eq 'adfgx' || $cipher_name eq 'nihilist' ) {
+        die "ERROR: The '$cipher_name' cipher requires a transposition key (-k) and a grid key (--grid-key).\n" 
+            unless defined $key_input && defined $grid_key_input;
+>>>>>>> 7160b9d13a7ee9e9faaeefc671e130c284624ebd
         $final_result = $function_ref->($text_input, [$grid_key_input, $key_input]);
         $command_info .= ", Transposition Key: \"$key_input\", Grid Key: \"$grid_key_input\"";
     }
-	elsif ($cipher_name eq 'threesquare') {
-    die "ERROR: The 'threesquare' cipher requires three keys (-k, -k2, -k3).\n" 
-        unless defined $key_input && defined $key2_input && defined $key3_input;
-    
-    $final_result = $function_ref->($text_input, [$key_input, $key2_input, $key3_input]);
-    $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\", Key 3: \"$key3_input\"";
-	}
-	# General handling for all other ciphers that need a single key
+    elsif ($cipher_name eq 'threesquare') {
+        die "ERROR: The 'threesquare' cipher requires three keys (-k, -k2, -k3).\n" 
+            unless defined $key_input && defined $key2_input && defined $key3_input;
+        $final_result = $function_ref->($text_input, [$key_input, $key2_input, $key3_input]);
+        $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\", Key 3: \"$key3_input\"";
+    }
+    # General handling for all other ciphers that need a single key.
     elsif ($cipher_info->{needs_key}) {
         die "ERROR: The '$cipher_name' cipher requires a key (-k).\n" unless defined $key_input;
-        # Specific key validations
+        # Specific key format validations.
         if ($cipher_name eq 'railfence' || $cipher_name eq 'caesarbox' || $cipher_name eq 'railfence' || $cipher_name eq 'route' || $cipher_name eq 'skip') {
             unless ($key_input =~ /^\d+$/ && $key_input > 1) {
                 die "ERROR: The key for '$cipher_name' must be an integer greater than 1.\n";
@@ -344,21 +378,33 @@ if ($cipher_name) {
                 die "ERROR: The key for 'affine' must be in the format 'a,b'.\n";
             }
         }
-		elsif ($cipher_name eq 'multiplicative') {
+        elsif ($cipher_name eq 'multiplicative') {
             unless ($key_input =~ /^\d+$/ && grep { $_ == $key_input } (1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25)) {
                 die "ERROR: The key for 'multiplicative' cipher must be an integer coprime with 26.\n" .
                     "       Possible values: 1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25.\n";
             }
-		}
+        }
+        # FIX: Added validation for Pollux key.
+        elsif ($cipher_name eq 'pollux') {
+            unless ($key_input =~ /^\d+$/) {
+                die "ERROR: The key for '$cipher_name' must be numeric.\n";
+            }
+            my %seen;
+            my @digits = split //, $key_input;
+            if (scalar(grep { !$seen{$_}++ } @digits) != scalar(@digits)) {
+                die "ERROR: The key for '$cipher_name' must not contain duplicate digits.\n";
+            }
+        }
         $final_result = $function_ref->($text_input, $key_input);
         $command_info .= ", Key: \"$key_input\"";
     }
+    # Handling for keyless ciphers.
     else {
         $final_result = $function_ref->($text_input);
     }
     
     print "$command_info\n";
-	
+    
     # --- Output Result ---
     if (defined $file_out) {
         open my $fh, '>', $file_out or die "ERROR: Could not write to output file '$file_out': $!\n";
@@ -368,7 +414,6 @@ if ($cipher_name) {
         print "Result => [$final_result]\n\n";
     }
 }
-
 # --- ENCODING MODE ---
 elsif ($mapping_name) {
     # --- Input Validation ---
@@ -376,12 +421,12 @@ elsif ($mapping_name) {
     die "ERROR: --encode and --decode options cannot be used together.\n" if $encode_flag && $decode_flag;
     die "ERROR: Encoding '$mapping_name' is unknown.\n" unless exists $encodings{$mapping_name};
 
-	# Determine action and function reference.
+    # Determine action and function reference.
     my $action = $encode_flag ? 'encode' : 'decode';
     my $mapping_info = $encodings{$mapping_name};
     my $function_ref = $mapping_info->{$action};
     
-	# Get input text.
+    # Get input text.
     my $text_input;
     if (defined $file_in) {
         open my $fh, '<', $file_in or die "ERROR: Could not open input file '$file_in': $!\n";
@@ -391,16 +436,16 @@ elsif ($mapping_name) {
         $text_input = shift @ARGV;
     }
     die "ERROR: No input text provided.\n" unless defined $text_input;
-	
-	$text_input = decode('UTF-8', $text_input) unless defined $file_in;
 
-	# Execute encoding/decoding.
+    $text_input = decode('UTF-8', $text_input) unless defined $file_in;
+
+    # Execute encoding/decoding.
     my $final_result = $function_ref->($text_input);
     my $command_info = "Encoding: $mapping_name, Action: $action";
     
     print "$command_info\n";
     
-	# Output result.
+    # Output result.
     if (defined $file_out) {
         open my $fh, '>', $file_out or die "ERROR: Could not write to output file '$file_out': $!\n";
         print $fh $final_result; close $fh;
@@ -409,7 +454,6 @@ elsif ($mapping_name) {
         print "Result => [$final_result]\n\n";
     }
 }
-
 # --- NO MODE CHOSEN ---
 # If no cipher or mapping was specified, or if -h was used, display help and exit.
 else {
