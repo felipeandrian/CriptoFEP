@@ -103,49 +103,6 @@ This is the complete list of algorithms currently supported by CriptoFEP.
 | **XOR**            |      Yes      | A modern, bitwise symmetric cipher.                                        |
 
 
-Of course. Here is the updated table with the **VIC Cipher** added in its correct alphabetical position.
-
-You can copy and paste this entire markdown block to replace the table in your `README.md` file.
-
-***
-### Ciphers (Key-based algorithms for confidentiality)
-
-| Name | Requires Key? | Description |
-| :--- | :---: | :--- |
-| **ADFGX** | Yes | The original 5x5 WWI German field cipher combining Polybius and columnar. |
-| **ADFGVX** | Yes | The advanced 6x6 version of ADFGX, including numbers. |
-| **Affine** | Yes | A mathematical substitution cipher using `(ax + b) mod 26`. |
-| **Albam** | No | A simple substitution cipher that swaps the two halves of the alphabet. |
-| **AMSCO** | Yes | An irregular columnar transposition using a 1-2 fill pattern. |
-| **Atbah** | No | A simple substitution cipher with a specific, non-sequential mapping. |
-| **Atbash** | No | A simple substitution cipher that reverses the alphabet (A=Z, B=Y...). |
-| **Bacon** | No | A 5-bit binary encoding that maps letters to sequences of 'A's and 'B's. |
-| **Bifid** | Yes | A fractionating cipher combining Polybius with transposition. |
-| **Caesar** | No | The classic shift cipher (fixed shift of 3). |
-| **Caesar Box** | Yes | A simple columnar transposition where columns are read in natural order. |
-| **Columnar** | Yes | A transposition cipher that rearranges text in columns based on a keyword. |
-| **Double Columnar**| Yes | Applies the Columnar Transposition cipher twice for enhanced security. |
-| **Four-Square** | Yes | A polygraphic cipher using four 5x5 grids to encrypt digraphs. |
-| **Keyboard Shift** | No | A substitution cipher based on shifting keys on a QWERTY keyboard. |
-| **Multiplicative** | Yes | A mathematical substitution cipher using `(ax) mod 26`. |
-| **Playfair** | Yes | The first practical polygraphic substitution cipher, using one 5x5 grid. |
-| **Rail Fence** | Yes | A transposition cipher that writes text in a zig-zag pattern. |
-| **Redefence** | Yes | A route cipher that writes text column-by-column and reads row-by-row. |
-| **ROT13** | No | A Caesar cipher with a fixed shift of 13. |
-| **ROT47** | No | A Caesar cipher that shifts all printable ASCII characters. |
-| **Route** | Yes | A transposition cipher that writes text in a clockwise inward spiral path. |
-| **Scytale** | No | An ancient transposition cipher simulating a cylinder (fixed at 5 rows). |
-| **Skip** | Yes | A simple transposition equivalent to a Caesar Box or basic Columnar. |
-| **Three-Square** | Yes | A polygraphic cipher using three 5x5 grids. |
-| **Trifid** | Yes | An advanced fractionating cipher using a 3x3x3 cube. |
-| **Turning Grille** | No | A transposition cipher using a rotating stencil with a fixed 6x6 grid. |
-| **Two-Square** | Yes | A polygraphic cipher using two 5x5 grids. |
-| **Unicode Shift** | Yes | A Caesar-like shift that works on any Unicode character, including emojis. |
-| **VIC** | Yes | A highly complex Cold War spy cipher combining key generation, a Straddling Checkerboard, and transposition. |
-| **Vigenère** | Yes | A polyalphabetic cipher using a keyword (Autokey variant). |
-| **XOR** | Yes | A modern, bitwise symmetric cipher. |
-
-
 ### Encodings (Standard, keyless mappings for representation)
 
 |    Name     |                              Description                                  |
