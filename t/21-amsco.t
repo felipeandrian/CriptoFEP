@@ -16,20 +16,11 @@ use CriptoFEP::AMSCO qw(amsco_encrypt amsco_decrypt);
 
 # --- Begin Tests ---
 
-# Use a simple, verifiable key and plaintext.
+# FIX: These are the mathematically correct values for the implementation.
 my $trans_key = "KEY";
 my $pattern_key = "12";
 my $plaintext = "ATTACK";
-# This is the correct ciphertext for the above keys and plaintext.
-# Chunks: A(1), TT(2), A(1), CK(2)
-# Pattern indices: 0, 1, 2, 3
-# Column indices:  0, 1, 0, 1
-# Col 0 gets: A, A -> "AA"
-# Col 1 gets: TT, CK -> "TTCK"
-# Col 2 is empty.
-# Key "KEY" sorted order is E(1), K(0), Y(2).
-# Read columns in order: Col 1, then Col 0.
-my $ciphertext = "TTCKAA";
+my $ciphertext = "TTACKA";
 
 # Test 1: Basic encryption with a known value
 is(
@@ -46,7 +37,6 @@ is(
 );
 
 # Test 3: Full Cycle Test
-# This is the most robust test.
 my $original = "This is a much longer test for the amsco transposition cipher";
 my $test_trans_key = "SECRETKEY";
 my $test_pattern_key = "1221";

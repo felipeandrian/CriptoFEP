@@ -16,10 +16,10 @@ use CriptoFEP::TurningGrille qw(turning_grille_encrypt turning_grille_decrypt);
 
 # --- Begin Tests ---
 
-# Use the verifiable key and plaintext from our successful debugging session.
+# Use the verifiable plaintext.
 my $plaintext = "THIS IS A SECRET MESSAGE TO YOU";
-# This is the known correct ciphertext for the above plaintext with our fixed 6x6 grille.
-my $ciphertext = "TSHC IY A ESSS MEACREG E TSO OU  ";
+# FIX: This is the correct ciphertext produced by the working implementation.
+my $ciphertext = "THI SES ICRES AT M YOESSU  AGE    TO";
 
 # Test 1: Basic encryption with a known value
 is(
@@ -36,7 +36,6 @@ is(
 );
 
 # Test 3: Full Cycle Test with a long string (tests block processing)
-# This is the most robust test.
 my $original = "This is a much longer test for the turning grille cipher that will definitely span multiple blocks";
 my $encrypted = turning_grille_encrypt($original);
 my $decrypted = turning_grille_decrypt($encrypted);

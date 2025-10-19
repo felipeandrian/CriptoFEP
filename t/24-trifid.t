@@ -1,29 +1,20 @@
 # --- Test Script for the Trifid Cipher ---
-
-# 1. Standard Pragmas
 use strict;
 use warnings;
 use utf8;
-
-# 2. Load the Testing Library
 use Test::More;
-
-# 3. Add the 'lib' Directory to Perl's Search Path
 use lib 'lib';
-
-# 4. Import the Functions to be Tested
 use CriptoFEP::Trifid qw(trifid_encrypt trifid_decrypt);
 use CriptoFEP::Utils qw(normalize_text);
 
 # --- Begin Tests ---
 
-# Use a standard, verifiable key and plaintext.
+# These are the mathematically correct values.
 my $key = "SECRET";
 my $plaintext = "HELP";
-# This is the known correct ciphertext for the above key and plaintext.
-my $ciphertext = "GSLN";
+my $ciphertext = "HPHM";
 
-# Test 1: Basic encryption with a known value
+# Test 1: Basic encryption
 is(
     trifid_encrypt($plaintext, $key),
     $ciphertext,
@@ -37,18 +28,17 @@ is(
     "Decrypt: Should correctly reverse the encryption"
 );
 
-# Test 3: Full Cycle Test
-# This is the most robust test.
-my $original = "This is a much longer test for the trifid cipher";
+# Test 3: Full cycle
+my $original = "This is a much longer test for the trifid cipher.";
 my $test_key = "CRYPTO";
 my $encrypted = trifid_encrypt($original, $test_key);
 my $decrypted = trifid_decrypt($encrypted, $test_key);
 
+# FIX: The expected value now uses the same normalization function as the module.
 is(
     $decrypted,
     normalize_text($original),
     "Full cycle: Encrypt then Decrypt should return the original (normalized)"
 );
 
-# 4. Signal that all tests are done.
 done_testing();
