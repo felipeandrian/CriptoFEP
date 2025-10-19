@@ -1,4 +1,4 @@
-# --- Test Script for the Caesar Box Cipher ---
+# --- Test Script for the Skip Cipher ---
 
 # 1. Standard Pragmas
 use strict;
@@ -12,35 +12,36 @@ use Test::More;
 use lib 'lib';
 
 # 4. Import the Functions to be Tested
-use CriptoFEP::CaesarBox qw(caesar_box_encrypt caesar_box_decrypt);
+use CriptoFEP::Skip qw(skip_encrypt skip_decrypt);
 
 # --- Begin Tests ---
 
 # Use a standard, verifiable key and plaintext.
 my $key = 4;
 my $plaintext = "ATTACK AT DAWN";
-# FIX: This is the mathematically correct ciphertext for the implementation.
-my $ciphertext = "ACTWTK N T D AAA ";
+# This is the known correct ciphertext for a working columnar implementation.
+my $ciphertext = "ACTW TK  T DAAN  ";
 
 # Test 1: Basic encryption with a known value
 is(
-    caesar_box_encrypt($plaintext, $key),
+    skip_encrypt($plaintext, $key),
     $ciphertext,
     "Encrypt: Should produce the correct ciphertext"
 );
 
 # Test 2: Basic decryption
 is(
-    caesar_box_decrypt($ciphertext, $key),
+    skip_decrypt($ciphertext, $key),
     $plaintext,
     "Decrypt: Should correctly reverse the encryption"
 );
 
 # Test 3: Full Cycle Test
-my $original = "This is a much longer test for the caesar box transposition";
-my $test_key = 7;
-my $encrypted = caesar_box_encrypt($original, $test_key);
-my $decrypted = caesar_box_decrypt($encrypted, $test_key);
+# This is the most robust test.
+my $original = "This is a much longer test for the skip cipher";
+my $test_key = 6;
+my $encrypted = skip_encrypt($original, $test_key);
+my $decrypted = skip_decrypt($encrypted, $test_key);
 is(
     $decrypted,
     $original,

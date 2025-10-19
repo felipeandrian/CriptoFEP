@@ -1,5 +1,5 @@
 #
-# CriptoFEP::UrlEncode
+# CriptoFEP::URLEncode
 #
 # This module provides a from-scratch implementation for URL Encoding, also known
 # as Percent-Encoding. It is designed to correctly encode and decode strings,
@@ -17,10 +17,11 @@ use utf8;
 
 
 # --- MODULE IMPORTS ---
-# Import the 'encode' function from Perl's core Encode module. This is the
-# low-level, professional way to convert Perl's internal character strings
-# into a specific byte sequence (in this case, UTF-8).
-use Encode qw(encode);
+# Import functions from Perl's core Encode module. This is the low-level,
+# professional way to handle character encodings.
+# 'encode' converts Perl's internal character strings into a specific byte sequence.
+# 'decode_utf8' does the reverse, interpreting a sequence of raw bytes as a UTF-8 string.
+use Encode qw(encode decode_utf8);
 
 
 # --- EXPORTER CONFIGURATION ---
@@ -78,7 +79,7 @@ sub url_encode {
    - $encoded_text (string): The URL-encoded string.
  
  B<Returns:>
-   - (string): The decoded original text.
+   - (string): The decoded original text, correctly interpreted as UTF-8.
  
 =cut
 sub url_decode {
@@ -87,16 +88,18 @@ sub url_decode {
     # First, handle a common web form convention where '+' is used as a substitute for a space.
     $text =~ s/\+/ /g;
     
-    # Use a substitution regex with the /e (evaluate) modifier. This is the most
-    # efficient and idiomatic way to perform this decoding in Perl.
+    # This regex converts all %HH sequences into their corresponding raw bytes.
     # It finds each percent-encoded sequence (%HH), and for each match:
     # 1. $1 captures the two hex digits (e.g., "C3").
     # 2. hex($1) converts the hex string to its decimal value (e.g., 195).
-    # 3. chr(...) converts the decimal value back into its corresponding character.
-    # The /g flag ensures this is done for all occurrences in the string.
+    # 3. chr(...) converts the decimal value back into its corresponding byte.
+    # The /ge flags ensure this is done globally and that the right-hand side is evaluated as code.
     $text =~ s/%([0-9a-fA-F]{2})/chr(hex($1))/ge;
     
-    return $text;
+    # The crucial final step: after converting all %HH to bytes, the resulting
+    # string might contain multi-byte UTF-8 sequences. We must tell Perl to
+    # interpret this raw byte string as a proper UTF-8 character string.
+    return decode_utf8($text);
 }
 
 =head2 info

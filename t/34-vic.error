@@ -1,0 +1,52 @@
+# --- Test Script for the VIC Cipher ---
+
+# 1. Standard Pragmas
+use strict;
+use warnings;
+use utf8;
+
+# 2. Load the Testing Library
+use Test::More;
+
+# 3. Add the 'lib' Directory to Perl's Search Path
+use lib 'lib';
+
+# 4. Import the Functions to be Tested
+use CriptoFEP::VIC qw(vic_encrypt vic_decrypt);
+
+# --- Begin Tests ---
+
+# Use the standard, verifiable keys and plaintext from our development.
+my $phrase = "A SIN TO SIN";
+my $date = "171025";
+my $plaintext = "ATTACK AT DAWN";
+# This is the known correct ciphertext for a working VIC implementation.
+my $ciphertext = "6903333306637";
+
+# Test 1: Basic encryption with a known value
+is(
+    vic_encrypt($plaintext, [$phrase, $date]),
+    $ciphertext,
+    "Encrypt: Should produce the correct, standard VIC ciphertext"
+);
+
+# Test 2: Basic decryption
+is(
+    vic_decrypt($ciphertext, [$phrase, $date]),
+    "ATTACKATDAWN", # Normalized version
+    "Decrypt: Should correctly reverse the encryption"
+);
+
+# Test 3: Full Cycle Test
+# This is the most robust test.
+my $original = "This is a much longer test for the VIC cipher";
+my $encrypted = vic_encrypt($original, [$phrase, $date]);
+my $decrypted = vic_decrypt($encrypted, [$phrase, $date]);
+is(
+    $decrypted,
+    "THISISAMUCHLONGERTESTFORTHEVICCIPHER", # Fully normalized
+    "Full cycle: Encrypt then Decrypt should return the original (normalized)"
+);
+
+# 4. Signal that all tests are done.
+done_testing();

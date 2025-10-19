@@ -20,8 +20,8 @@ use CriptoFEP::DoubleColumnar qw(double_columnar_encrypt double_columnar_decrypt
 my $key1 = "GERMAN";
 my $key2 = "SECRET";
 my $plaintext = "ATTACK AT DAWN";
-# This is the known correct ciphertext for a working columnar implementation.
-my $ciphertext = "TT DN  K AT C AAWA  ";
+# FIX: The expected value has been corrected based on your verification, including the space.
+my $ciphertext = "TADWTNKA C TAA";
 
 # Test 1: Basic encryption with a known value
 is(

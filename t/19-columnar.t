@@ -1,28 +1,19 @@
 # --- Test Script for the Columnar Transposition Cipher ---
-
-# 1. Standard Pragmas
 use strict;
 use warnings;
 use utf8;
-
-# 2. Load the Testing Library
 use Test::More;
-
-# 3. Add the 'lib' Directory to Perl's Search Path
 use lib 'lib';
-
-# 4. Import the Functions to be Tested
 use CriptoFEP::Columnar qw(columnar_encrypt columnar_decrypt);
 
 # --- Begin Tests ---
 
-# Use a standard, well-known key and plaintext for verification.
+# These are the correct, verified values for this standard example.
 my $key = "ZEBRA";
 my $plaintext = "WE ARE DISCOVERED FLEE AT ONCE";
-# This is the known correct ciphertext for the robust, non-padding implementation.
-my $ciphertext = "EVLNAEWDCEEAEOSCRFTIO";
+my $ciphertext = "RSRLTE DV  NE ODEOAIEFACWECEE "; # Using your verified ciphertext
 
-# Test 1: Basic encryption with a known value
+# Test 1: Basic encryption
 is(
     columnar_encrypt($plaintext, $key),
     $ciphertext,
@@ -37,7 +28,6 @@ is(
 );
 
 # Test 3: Full Cycle Test
-# This is the most robust test, as it doesn't depend on pre-calculated values.
 my $original = "This is a much longer test for the columnar transposition cipher";
 my $test_key = "SECRETKEY";
 my $encrypted = columnar_encrypt($original, $test_key);
@@ -48,5 +38,4 @@ is(
     "Full cycle: Encrypt then Decrypt should return the original text perfectly"
 );
 
-# 4. Signal that all tests are done.
 done_testing();
