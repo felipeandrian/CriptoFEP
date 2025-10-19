@@ -1,0 +1,30 @@
+# --- Test Script for the Scytale Cipher ---
+
+use strict;
+use warnings;
+
+use Test::More;
+
+use lib 'lib';
+
+use CriptoFEP::Scytale qw(scytale_encrypt scytale_decrypt);
+
+# --- Begin Tests ---
+
+# Estes são os valores matematicamente corretos que a nova implementação produz.
+my $plaintext  = "WE ARE DISCOVERED FLEE AT ONCE";
+my $ciphertext = "W VF TED LE  R EOAS ENRC DCE O AE";
+
+# Teste 1: Encriptação básica
+is( scytale_encrypt($plaintext), $ciphertext, "Encrypt: Should produce the correct ciphertext" );
+
+# Teste 2: Decriptação básica
+is( scytale_decrypt($ciphertext), $plaintext, "Decrypt: Should correctly reverse the ciphertext" );
+
+# Teste 3: Ciclo completo (o teste mais robusto)
+my $original_text = "This is a test of the Scytale cipher module";
+my $encrypted = scytale_encrypt($original_text);
+my $decrypted = scytale_decrypt($encrypted);
+is( $decrypted, $original_text, "Full cycle: Encrypt then Decrypt should return the original perfectly" );
+
+done_testing();

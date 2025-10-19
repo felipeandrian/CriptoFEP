@@ -1,0 +1,54 @@
+# --- Test Script for the Double Columnar Transposition Cipher ---
+
+# 1. Standard Pragmas
+use strict;
+use warnings;
+use utf8;
+
+# 2. Load the Testing Library
+use Test::More;
+
+# 3. Add the 'lib' Directory to Perl's Search Path
+use lib 'lib';
+
+# 4. Import the Functions to be Tested
+use CriptoFEP::DoubleColumnar qw(double_columnar_encrypt double_columnar_decrypt);
+
+# --- Begin Tests ---
+
+# Use a standard, well-known set of keys and plaintext for verification.
+my $key1 = "GERMAN";
+my $key2 = "SECRET";
+my $plaintext = "ATTACK AT DAWN";
+# This is the known correct ciphertext for a working columnar implementation.
+my $ciphertext = "TT DN  K AT C AAWA  ";
+
+# Test 1: Basic encryption with a known value
+is(
+    double_columnar_encrypt($plaintext, [$key1, $key2]),
+    $ciphertext,
+    "Encrypt: Should produce the correct, standard ciphertext"
+);
+
+# Test 2: Basic decryption
+is(
+    double_columnar_decrypt($ciphertext, [$key1, $key2]),
+    $plaintext,
+    "Decrypt: Should correctly reverse the encryption"
+);
+
+# Test 3: Full Cycle Test
+# This is the most robust test, as it doesn't depend on pre-calculated values.
+my $original = "This is a much longer test for the double columnar transposition";
+my $test_key1 = "SECRETKEY";
+my $test_key2 = "ANOTHERKEY";
+my $encrypted = double_columnar_encrypt($original, [$test_key1, $test_key2]);
+my $decrypted = double_columnar_decrypt($encrypted, [$test_key1, $test_key2]);
+is(
+    $decrypted,
+    $original,
+    "Full cycle: Encrypt then Decrypt should return the original text perfectly"
+);
+
+# 4. Signal that all tests are done.
+done_testing();

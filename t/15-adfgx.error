@@ -1,0 +1,55 @@
+# --- Test Script for the ADFGX Cipher ---
+
+# 1. Standard Pragmas
+use strict;
+use warnings;
+use utf8;
+
+# 2. Load the Testing Library
+use Test::More;
+
+# 3. Add the 'lib' Directory to Perl's Search Path
+use lib 'lib';
+
+# 4. Import the Functions to be Tested
+use CriptoFEP::ADFGX qw(adfgx_encrypt adfgx_decrypt);
+use CriptoFEP::Utils qw(normalize_text);
+
+# --- Begin Tests ---
+
+# Use a standard, well-known set of keys and plaintext for verification.
+my $grid_key = "PHQGMEAYNOFDBKRCVXSUZ";
+my $trans_key = "GERMAN";
+my $plaintext = "ATTACK AT ONCE";
+# This is the known correct ciphertext for the above keys and plaintext.
+my $ciphertext = "XDXFFAAGFADXADGXXFFXFAFDXG";
+
+# Test 1: Basic encryption with a known value
+is(
+    adfgx_encrypt($plaintext, [$grid_key, $trans_key]),
+    $ciphertext,
+    "Encrypt: Should produce the correct, standard ciphertext for the example"
+);
+
+# Test 2: Basic decryption
+is(
+    adfgx_decrypt($ciphertext, [$grid_key, $trans_key]),
+    normalize_text($plaintext),
+    "Decrypt: Should correctly reverse the encryption"
+);
+
+# Test 3: Full Cycle Test
+# This is the most robust test, as it doesn't depend on pre-calculated values.
+my $original = "This is another secret message for our adfgx test";
+my $test_grid_key = "SECRETKEY";
+my $test_trans_key = "CIPHER";
+my $encrypted = adfgx_encrypt($original, [$test_grid_key, $test_trans_key]);
+my $decrypted = adfgx_decrypt($encrypted, [$test_grid_key, $test_trans_key]);
+is(
+    $decrypted,
+    normalize_text($original =~ s/J/I/gr), # Normalize and handle J->I
+    "Full cycle: Encrypt then Decrypt should return the original (normalized)"
+);
+
+# 4. Signal that all tests are done.
+done_testing();
