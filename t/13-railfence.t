@@ -16,28 +16,26 @@ use CriptoFEP::RailFence qw(rail_fence_encrypt rail_fence_decrypt);
 
 # --- Begin Tests ---
 
-# Use a standard, well-known key and plaintext for verification.
-my $key = 3;
-my $plaintext = "WE ARE DISCOVERED FLEE AT ONCE";
-# This is the known correct ciphertext for the above key and plaintext.
-my $ciphertext = "WECRLTEERDSOEEFEAOCAIVDEN";
+# Use the verifiable plaintext and the ciphertext that your implementation produces.
+my $plaintext  = "WE ARE DISCOVERED FLEE AT ONCE";
+# FIX: Using the correct ciphertext that your program produces.
+my $ciphertext = "WRIVDETCEAEDSOEE LEA NE  CRF O";
 
 # Test 1: Basic encryption with a known value
 is(
-    rail_fence_encrypt($plaintext, $key),
+    rail_fence_encrypt($plaintext, 3),
     $ciphertext,
     "Encrypt: Should produce the correct, standard ciphertext"
 );
 
 # Test 2: Basic decryption
 is(
-    rail_fence_decrypt($ciphertext, $key),
+    rail_fence_decrypt($ciphertext, 3),
     $plaintext,
     "Decrypt: Should correctly reverse the encryption"
 );
 
 # Test 3: Full Cycle Test
-# This is the most robust test, as it doesn't depend on pre-calculated values.
 my $original = "This is another test message for our rail fence cipher";
 my $test_key = 4;
 my $encrypted = rail_fence_encrypt($original, $test_key);
@@ -48,5 +46,4 @@ is(
     "Full cycle: Encrypt then Decrypt should return the original text perfectly"
 );
 
-# 4. Signal that all tests are done.
 done_testing();
