@@ -17,12 +17,12 @@ use CriptoFEP::Utils qw(normalize_text);
 
 # --- Begin Tests ---
 
-# Use a standard, well-known set of keys and plaintext for verification.
+# Use the verifiable keys and plaintext.
 my $grid_key = "PHQGMEAYNOFDBKRCVXSUZ";
 my $trans_key = "GERMAN";
 my $plaintext = "ATTACK AT ONCE";
-# This is the known correct ciphertext for the above keys and plaintext.
-my $ciphertext = "XDXFFAAGFADXADGXXFFXFAFDXG";
+# FIX: Using the correct ciphertext
+my $ciphertext = "XFDDDDDGDDDDGAGAGGXAXGXG";
 
 # Test 1: Basic encryption with a known value
 is(
@@ -39,7 +39,6 @@ is(
 );
 
 # Test 3: Full Cycle Test
-# This is the most robust test, as it doesn't depend on pre-calculated values.
 my $original = "This is another secret message for our adfgx test";
 my $test_grid_key = "SECRETKEY";
 my $test_trans_key = "CIPHER";
