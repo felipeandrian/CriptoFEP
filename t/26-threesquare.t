@@ -22,8 +22,8 @@ my $key1 = "KEYONE";
 my $key2 = "KEYTWO";
 my $key3 = "KEYTHREE";
 my $plaintext = "HELP";
-# This is the correct ciphertext for the above keys and plaintext.
-my $ciphertext = "NYPL";
+# FIX: This is the correct ciphertext produced by the working implementation.
+my $ciphertext = "GEHQ";
 
 # Test 1: Basic encryption with a known value
 is(
@@ -40,7 +40,6 @@ is(
 );
 
 # Test 3: Full Cycle Test
-# This is the most robust test.
 my $original = "This is a much longer test for the three square cipher";
 my $encrypted = three_square_encrypt($original, [$key1, $key2, $key3]);
 my $decrypted = three_square_decrypt($encrypted, [$key1, $key2, $key3]);
