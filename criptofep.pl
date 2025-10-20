@@ -58,6 +58,7 @@ use CriptoFEP::Route qw(route_encrypt route_decrypt);
 use CriptoFEP::Skip qw(skip_encrypt skip_decrypt);
 use CriptoFEP::TurningGrille qw(turning_grille_encrypt turning_grille_decrypt);
 use CriptoFEP::VIC qw(vic_encrypt vic_decrypt);
+use CriptoFEP::VigenereStandard qw(vigenere_standard_encrypt vigenere_standard_decrypt);
 # Encodings
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -88,7 +89,7 @@ my %ciphers = (
     'rot47' =>    { encrypt => \&rot47_cipher,     decrypt => \&rot47_cipher,     needs_key => 0, info => \&CriptoFEP::Rot47::info },
     'bacon' =>    { encrypt => \&bacon_encrypt,    decrypt => \&bacon_decrypt,    needs_key => 0, info => \&CriptoFEP::Bacon::info },
     'xor' =>      { encrypt => \&xor_encrypt,      decrypt => \&xor_decrypt,      needs_key => 1, info => \&CriptoFEP::XOR::info },
-    'vigenere' => { encrypt => \&vigenere_encrypt, decrypt => \&vigenere_decrypt, needs_key => 1, info => \&CriptoFEP::Vigenere::info },
+    'vigenere-autokey' => { encrypt => \&vigenere_encrypt, decrypt => \&vigenere_decrypt, needs_key => 1, info => \&CriptoFEP::Vigenere::info },
     'playfair' => { encrypt => \&playfair_encrypt, decrypt => \&playfair_decrypt, needs_key => 1, info => \&CriptoFEP::Playfair::info },
     'railfence' => { encrypt => \&rail_fence_encrypt, decrypt => \&rail_fence_decrypt, needs_key => 1, info => \&CriptoFEP::RailFence::info},
     'affine' =>   { encrypt => \&affine_encrypt,   decrypt => \&affine_decrypt,   needs_key => 1, info => \&CriptoFEP::Affine::info },
@@ -110,6 +111,7 @@ my %ciphers = (
 	'skip'      => { encrypt => \&skip_encrypt,       decrypt => \&skip_decrypt,       needs_key => 1, info => \&CriptoFEP::Skip::info },
 	'turninggrille' => { encrypt => \&turning_grille_encrypt, decrypt => \&turning_grille_decrypt, needs_key => 0, info => \&CriptoFEP::TurningGrille::info },
 	'vic'           => { encrypt => \&vic_encrypt, decrypt => \&vic_decrypt, needs_key => 1, info => \&CriptoFEP::VIC::info },
+	'vigenere' => { encrypt => \&vigenere_standard_encrypt, decrypt => \&vigenere_standard_decrypt, needs_key => 1, info => \&CriptoFEP::VigenereStandard::info },
 );
 # --- ENCODING DATA STRUCTURE ---
 my %encodings = (
