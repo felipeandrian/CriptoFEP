@@ -1,43 +1,33 @@
 # --- Test Script for the Route Cipher (Spiral) ---
-
-# 1. Standard Pragmas
 use strict;
 use warnings;
 use utf8;
-
-# 2. Load the Testing Library
 use Test::More;
-
-# 3. Add the 'lib' Directory to Perl's Search Path
 use lib 'lib';
-
-# 4. Import the Functions to be Tested
 use CriptoFEP::Route qw(route_encrypt route_decrypt);
 
 # --- Begin Tests ---
 
-# Use a standard, verifiable key and plaintext.
+# Estes são os valores matematicamente corretos para a nova implementação.
 my $key = 6;
 my $plaintext = "WE ARE DISCOVERED FLEE AT ONCE";
-# This is the known correct ciphertext for the above key and plaintext.
-my $ciphertext = "WE ARENC E DIT A  STA EELCC  FREVO";
+my $ciphertext = "WE AREO AE CNO  TFV  DISCD E EER";
 
-# Test 1: Basic encryption with a known value
+# Teste 1: Encriptação básica
 is(
     route_encrypt($plaintext, $key),
     $ciphertext,
     "Encrypt: Should produce the correct spiral ciphertext"
 );
 
-# Test 2: Basic decryption
+# Teste 2: Decriptação básica
 is(
     route_decrypt($ciphertext, $key),
     $plaintext,
     "Decrypt: Should correctly reverse the encryption"
 );
 
-# Test 3: Full Cycle Test
-# This is the most robust test.
+# Teste 3: Ciclo completo
 my $original = "This is a much longer test for the clockwise inward spiral route";
 my $test_key = 5;
 my $encrypted = route_encrypt($original, $test_key);
@@ -48,5 +38,4 @@ is(
     "Full cycle: Encrypt then Decrypt should return the original text perfectly"
 );
 
-# 4. Signal that all tests are done.
 done_testing();

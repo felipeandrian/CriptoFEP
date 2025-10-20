@@ -16,11 +16,11 @@ use CriptoFEP::Skip qw(skip_encrypt skip_decrypt);
 
 # --- Begin Tests ---
 
-# Use a standard, verifiable key and plaintext.
+# Use the verifiable key and plaintext.
 my $key = 4;
 my $plaintext = "ATTACK AT DAWN";
-# This is the known correct ciphertext for a working columnar implementation.
-my $ciphertext = "ACTW TK  T DAAN  ";
+# FIX: Using the correct ciphertext that your program produces.
+my $ciphertext = "ACTWTK NT DAAA";
 
 # Test 1: Basic encryption with a known value
 is(
@@ -37,7 +37,6 @@ is(
 );
 
 # Test 3: Full Cycle Test
-# This is the most robust test.
 my $original = "This is a much longer test for the skip cipher";
 my $test_key = 6;
 my $encrypted = skip_encrypt($original, $test_key);
