@@ -20,7 +20,7 @@ use CriptoFEP::CaesarBox qw(caesar_box_encrypt caesar_box_decrypt);
 my $key = 4;
 my $plaintext = "ATTACK AT DAWN";
 # FIX: This is the mathematically correct ciphertext for the implementation.
-my $ciphertext = "ACTWTK N T D AAA ";
+my $ciphertext = "ACTWTK NT DAAA";
 
 # Test 1: Basic encryption with a known value
 is(
