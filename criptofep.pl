@@ -75,6 +75,8 @@ use CriptoFEP::Base10 qw(base10_encode base10_decode );
 use CriptoFEP::Base8 qw(base8_encode base8_decode );
 use CriptoFEP::Base2 qw(base2_encode base2_decode );
 use CriptoFEP::UrlEncode qw(url_encode url_decode);
+#Analysis
+use CriptoFEP::Analyzer qw(analyze_frequency analyze_ic find_key_length);
 
 # --- CIPHER DATA STRUCTURE ---
 # A hash of hashes that organizes all our ciphers and their functions.
@@ -267,6 +269,7 @@ my ($cipher_name, $encrypt_flag, $decrypt_flag, $key_input, $key2_input, $key3_i
 my ($mapping_name, $encode_flag, $decode_flag);
 my ($file_in, $file_out, $show_help, $info_flag);
 my ($list_ciphers_flag, $list_encodings_flag);
+my ($analyze_flag, $lang_input);
 
 # Parse command-line arguments using Getopt::Long, mapping them to variables.
 GetOptions(
@@ -288,6 +291,8 @@ GetOptions(
     'date=s'        => \$date_input,
     'list-ciphers'    => \$list_ciphers_flag,
     'list-encodings'  => \$list_encodings_flag,
+	'a|analyze=s'      => \$analyze_flag,   
+    'lang=s'           => \$lang_input,
 );
 
 # Display the application banner on every run.
@@ -304,6 +309,28 @@ elsif ($list_encodings_flag) {
     exit 0;
 }
 # ----------------------------------------
+
+elsif (defined $analyze_flag) {
+    my $text_input = shift @ARGV;
+    die "ERROR: No input text provided for analysis.\n" unless defined $text_input;
+    $text_input = decode('UTF-8', $text_input);
+
+    my $analysis_result;
+    if ($analyze_flag eq 'freq') {
+        $analysis_result = analyze_frequency($text_input, $lang_input);
+    }
+    elsif ($analyze_flag eq 'ic') { # <-- NOVO BLOCO
+        $analysis_result = analyze_ic($text_input, $lang_input);
+    }
+	elsif ($analyze_flag eq 'poly-detect') {
+        $analysis_result = find_key_length($text_input, $lang_input);
+    }
+    else {
+        die "ERROR: Unknown analysis type '$analyze_flag'. Supported: 'freq', 'ic'.\n";
+    }
+    print $analysis_result;
+    exit 0;
+}
 
 # --- INFO MODE ---
 # This mode also has priority, displaying help for a specific algorithm.
