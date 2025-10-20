@@ -99,7 +99,8 @@ This is the complete list of algorithms currently supported by CriptoFEP.
 | **Turning Grille** |      No       | A transposition cipher using a rotating stencil with a fixed 6x6 grid.     |
 | **Two-Square**     |      Yes      | A polygraphic cipher using two 5x5 grids.                                  |
 | **VIC**            |      Yes      | A highly complex Cold War spy cipher.                                      |
-| **Vigenère**       |      Yes      | A polyalphabetic cipher using a keyword (Autokey variant).                 |
+| **Vigenère(auto)** |      Yes      | A polyalphabetic cipher using a keyword (Autokey variant).                 |
+| **Vigenère**       |      Yes      | A polyalphabetic cipher using a keyword.                                   |
 | **XOR**            |      Yes      | A modern, bitwise symmetric cipher.                                        |
 
 
@@ -164,6 +165,8 @@ perl criptofep.pl -m <mapping> [--encode|--decode] ["text" | --in <file>] [--out
 | Option             | Description                                       |
 | ------------------ | ------------------------------------------------- |
 | `-h`, `--help`     | Display the full help message and exit.           |
+| `--list-ciphers`   | Display all ciphers                               |
+| `--list-encodings` | Display all encodings                             |
 | `--in <FILE>`      | Read input text from the specified file.          |
 | `--out <FILE>`     | Write the output to the specified file.           |
 
@@ -192,6 +195,7 @@ perl criptofep.pl -m <mapping> [--encode|--decode] ["text" | --in <file>] [--out
 | `-k3`, `--key3 <KEY>` | Provide the third key (for 'threesquare').                           |
 | `--grid-key <KEY>`    | Provide the grid generation key (for `adfgx`, `adfgvx`).             |
 | `--pattern-key <VAL>` | Provide the pattern key (for `amsco`, e.g., "1221").                 |
+| `--date <DATE>`       | Provide the date (for 'vic' cipher).                                 |
 
 ### Practical Examples
 
@@ -235,7 +239,7 @@ CriptoFEP/
 │       └── ...
 │
 ├── t/                    # Directory for automated tests (*.t files)
-│
+│   
 ├── README.md             # This documentation file
 │
 └── LICENSE               # MIT License file

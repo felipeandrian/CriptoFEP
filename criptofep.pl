@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/-bin/perl
 #
 # CriptoFEP - The Main Controller
 # This script serves as the main entry point and command-line interface
@@ -25,7 +25,7 @@ use Encode qw(decode);
 # --- LOAD CUSTOM MODULES ---
 # Specify the 'lib' directory as a source for our custom modules.
 use lib 'lib';
-# Ciphers
+# Ciphers (Algorithms for hiding information, usually requiring a key)
 use CriptoFEP::Cesar qw(cesar_encrypt cesar_decrypt);
 use CriptoFEP::Atbash qw(atbash_cipher);
 use CriptoFEP::Atbah qw(atbah_cipher);
@@ -44,7 +44,7 @@ use CriptoFEP::ADFGX qw(adfgx_encrypt adfgx_decrypt);
 use CriptoFEP::ADFGVX qw(adfgvx_encrypt adfgvx_decrypt);
 use CriptoFEP::Multiplicative qw(multiplicative_encrypt multiplicative_decrypt);
 use CriptoFEP::KeyboardShift qw(keyboard_shift_encrypt keyboard_shift_decrypt);
-use CriptoFEP::Columnar qw(columnar_encrypt columnar_decrypt); 
+use CriptoFEP::Columnar qw(columnar_encrypt columnar_decrypt);
 use CriptoFEP::DoubleColumnar qw(double_columnar_encrypt double_columnar_decrypt);
 use CriptoFEP::AMSCO qw(amsco_encrypt amsco_decrypt);
 use CriptoFEP::CaesarBox qw(caesar_box_encrypt caesar_box_decrypt);
@@ -59,7 +59,7 @@ use CriptoFEP::Skip qw(skip_encrypt skip_decrypt);
 use CriptoFEP::TurningGrille qw(turning_grille_encrypt turning_grille_decrypt);
 use CriptoFEP::VIC qw(vic_encrypt vic_decrypt);
 use CriptoFEP::VigenereStandard qw(vigenere_standard_encrypt vigenere_standard_decrypt);
-# Encodings
+# Encodings (Systems for representing information, no secret key required)
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
 use CriptoFEP::NATO qw(nato_encode nato_decode);
@@ -70,7 +70,7 @@ use CriptoFEP::T9 qw(t9_encode t9_decode);
 use CriptoFEP::BrailleGS8 qw(braille_encode braille_decode);
 use CriptoFEP::Base32 qw(base32_encode base32_decode);
 use CriptoFEP::Base64 qw(base64_encode base64_decode);
-use CriptoFEP::Base16 qw(base16_encode base16_decode ); 
+use CriptoFEP::Base16 qw(base16_encode base16_decode );
 use CriptoFEP::Base10 qw(base10_encode base10_decode );
 use CriptoFEP::Base8 qw(base8_encode base8_decode );
 use CriptoFEP::Base2 qw(base2_encode base2_decode );
@@ -78,62 +78,65 @@ use CriptoFEP::UrlEncode qw(url_encode url_decode);
 
 # --- CIPHER DATA STRUCTURE ---
 # A hash of hashes that organizes all our ciphers and their functions.
+# This acts as a dispatch table, mapping the command-line name to its
+# corresponding functions and metadata (e.g., if it requires a key).
 my %ciphers = (
-    'cesar' =>    { encrypt => \&cesar_encrypt,    decrypt => \&cesar_decrypt,    needs_key => 0, , info => \&CriptoFEP::Cesar::info },
-    'atbash' =>   { encrypt => \&atbash_cipher,    decrypt => \&atbash_cipher,    needs_key => 0, , info => \&CriptoFEP::Atbash::info },
-    'atbah' =>    { encrypt => \&atbah_cipher,     decrypt => \&atbah_cipher,     needs_key => 0, , info => \&CriptoFEP::Atbah::info },
-    'albam' =>    { encrypt => \&albam_cipher,     decrypt => \&albam_cipher,     needs_key => 0, info => \&CriptoFEP::Albam::info },
-    'scytale' =>  { encrypt => \&scytale_encrypt,  decrypt => \&scytale_decrypt,  needs_key => 0, info => \&CriptoFEP::Scytale::info},
+    'cesar' => { encrypt => \&cesar_encrypt, decrypt => \&cesar_decrypt, needs_key => 0, , info => \&CriptoFEP::Cesar::info },
+    'atbash' => { encrypt => \&atbash_cipher, decrypt => \&atbash_cipher, needs_key => 0, , info => \&CriptoFEP::Atbash::info },
+    'atbah' => { encrypt => \&atbah_cipher, decrypt => \&atbah_cipher, needs_key => 0, , info => \&CriptoFEP::Atbah::info },
+    'albam' => { encrypt => \&albam_cipher, decrypt => \&albam_cipher, needs_key => 0, info => \&CriptoFEP::Albam::info },
+    'scytale' => { encrypt => \&scytale_encrypt, decrypt => \&scytale_decrypt, needs_key => 0, info => \&CriptoFEP::Scytale::info},
     'polybius' => { encrypt => \&polybius_encrypt, decrypt => \&polybius_decrypt, needs_key => 0, info => \&CriptoFEP::Polybius::info },
-    'rot13' =>    { encrypt => \&rot13_cipher,     decrypt => \&rot13_cipher,     needs_key => 0, info => \&CriptoFEP::Rot13::info },
-    'rot47' =>    { encrypt => \&rot47_cipher,     decrypt => \&rot47_cipher,     needs_key => 0, info => \&CriptoFEP::Rot47::info },
-    'bacon' =>    { encrypt => \&bacon_encrypt,    decrypt => \&bacon_decrypt,    needs_key => 0, info => \&CriptoFEP::Bacon::info },
-    'xor' =>      { encrypt => \&xor_encrypt,      decrypt => \&xor_decrypt,      needs_key => 1, info => \&CriptoFEP::XOR::info },
+    'rot13' => { encrypt => \&rot13_cipher, decrypt => \&rot13_cipher, needs_key => 0, info => \&CriptoFEP::Rot13::info },
+    'rot47' => { encrypt => \&rot47_cipher, decrypt => \&rot47_cipher, needs_key => 0, info => \&CriptoFEP::Rot47::info },
+    'bacon' => { encrypt => \&bacon_encrypt, decrypt => \&bacon_decrypt, needs_key => 0, info => \&CriptoFEP::Bacon::info },
+    'xor' => { encrypt => \&xor_encrypt, decrypt => \&xor_decrypt, needs_key => 1, info => \&CriptoFEP::XOR::info },
     'vigenere-autokey' => { encrypt => \&vigenere_encrypt, decrypt => \&vigenere_decrypt, needs_key => 1, info => \&CriptoFEP::Vigenere::info },
     'playfair' => { encrypt => \&playfair_encrypt, decrypt => \&playfair_decrypt, needs_key => 1, info => \&CriptoFEP::Playfair::info },
     'railfence' => { encrypt => \&rail_fence_encrypt, decrypt => \&rail_fence_decrypt, needs_key => 1, info => \&CriptoFEP::RailFence::info},
-    'affine' =>   { encrypt => \&affine_encrypt,   decrypt => \&affine_decrypt,   needs_key => 1, info => \&CriptoFEP::Affine::info },
-	'adfgx'     => { encrypt => \&adfgx_encrypt,    decrypt => \&adfgx_decrypt,    needs_key => 1, info => \&CriptoFEP::ADFGX::info }, 
-    'adfgvx' =>   { encrypt => \&adfgvx_encrypt,   decrypt => \&adfgvx_decrypt,   needs_key => 1, info => \&CriptoFEP::ADFGVX::info },
-	'multiplicative' => { encrypt => \&multiplicative_encrypt, decrypt => \&multiplicative_decrypt, needs_key => 1, info => \&CriptoFEP::Multiplicative::info }, 
-	'keyboardshift'  => { encrypt => \&keyboard_shift_encrypt, decrypt => \&keyboard_shift_decrypt, needs_key => 0, info => \&CriptoFEP::KeyboardShift::info },
-	'columnar' => { encrypt => \&columnar_encrypt, decrypt => \&columnar_decrypt, needs_key => 1, info => \&CriptoFEP::Columnar::info }, 
-	'doublecolumnar' => { encrypt => \&double_columnar_encrypt, decrypt => \&double_columnar_decrypt, needs_key => 1, info => \&CriptoFEP::DoubleColumnar::info },
-	'amsco' => { encrypt => \&amsco_encrypt, decrypt => \&amsco_decrypt, needs_key => 1, info => \&CriptoFEP::AMSCO::info }, 
-	'caesarbox'      => { encrypt => \&caesar_box_encrypt,      decrypt => \&caesar_box_decrypt,      needs_key => 1, info => \&CriptoFEP::CaesarBox::info }, 
-	'bifid'     => { encrypt => \&bifid_encrypt,      decrypt => \&bifid_decrypt,      needs_key => 1, info => \&CriptoFEP::Bifid::info },
-	'trifid'    => { encrypt => \&trifid_encrypt,     decrypt => \&trifid_decrypt,     needs_key => 1, info => \&CriptoFEP::Trifid::info },
-	'twosquare' => { encrypt => \&two_square_encrypt, decrypt => \&two_square_decrypt, needs_key => 1, info => \&CriptoFEP::TwoSquare::info },
-	'threesquare' => { encrypt => \&three_square_encrypt, decrypt => \&three_square_decrypt, needs_key => 1, info => \&CriptoFEP::ThreeSquare::info },
-	'foursquare' => { encrypt => \&four_square_encrypt, decrypt => \&four_square_decrypt, needs_key => 1, info => \&CriptoFEP::FourSquare::info  },
-	'redefence' => { encrypt => \&redefence_encrypt,  decrypt => \&redefence_decrypt,  needs_key => 1, info => \&CriptoFEP::Redefence::info },
-	'route'     => { encrypt => \&route_encrypt,      decrypt => \&route_decrypt,      needs_key => 1, info => \&CriptoFEP::Route::info },
-	'skip'      => { encrypt => \&skip_encrypt,       decrypt => \&skip_decrypt,       needs_key => 1, info => \&CriptoFEP::Skip::info },
-	'turninggrille' => { encrypt => \&turning_grille_encrypt, decrypt => \&turning_grille_decrypt, needs_key => 0, info => \&CriptoFEP::TurningGrille::info },
-	'vic'           => { encrypt => \&vic_encrypt, decrypt => \&vic_decrypt, needs_key => 1, info => \&CriptoFEP::VIC::info },
-	'vigenere' => { encrypt => \&vigenere_standard_encrypt, decrypt => \&vigenere_standard_decrypt, needs_key => 1, info => \&CriptoFEP::VigenereStandard::info },
+    'affine' => { encrypt => \&affine_encrypt, decrypt => \&affine_decrypt, needs_key => 1, info => \&CriptoFEP::Affine::info },
+    'adfgx' => { encrypt => \&adfgx_encrypt, decrypt => \&adfgx_decrypt, needs_key => 1, info => \&CriptoFEP::ADFGX::info },
+    'adfgvx' => { encrypt => \&adfgvx_encrypt, decrypt => \&adfgvx_decrypt, needs_key => 1, info => \&CriptoFEP::ADFGVX::info },
+    'multiplicative' => { encrypt => \&multiplicative_encrypt, decrypt => \&multiplicative_decrypt, needs_key => 1, info => \&CriptoFEP::Multiplicative::info },
+    'keyboardshift' => { encrypt => \&keyboard_shift_encrypt, decrypt => \&keyboard_shift_decrypt, needs_key => 0, info => \&CriptoFEP::KeyboardShift::info },
+    'columnar' => { encrypt => \&columnar_encrypt, decrypt => \&columnar_decrypt, needs_key => 1, info => \&CriptoFEP::Columnar::info },
+    'doublecolumnar' => { encrypt => \&double_columnar_encrypt, decrypt => \&double_columnar_decrypt, needs_key => 1, info => \&CriptoFEP::DoubleColumnar::info },
+    'amsco' => { encrypt => \&amsco_encrypt, decrypt => \&amsco_decrypt, needs_key => 1, info => \&CriptoFEP::AMSCO::info },
+    'caesarbox' => { encrypt => \&caesar_box_encrypt, decrypt => \&caesar_box_decrypt, needs_key => 1, info => \&CriptoFEP::CaesarBox::info },
+    'bifid' => { encrypt => \&bifid_encrypt, decrypt => \&bifid_decrypt, needs_key => 1, info => \&CriptoFEP::Bifid::info },
+    'trifid' => { encrypt => \&trifid_encrypt, decrypt => \&trifid_decrypt, needs_key => 1, info => \&CriptoFEP::Trifid::info },
+    'twosquare' => { encrypt => \&two_square_encrypt, decrypt => \&two_square_decrypt, needs_key => 1, info => \&CriptoFEP::TwoSquare::info },
+    'threesquare' => { encrypt => \&three_square_encrypt, decrypt => \&three_square_decrypt, needs_key => 1, info => \&CriptoFEP::ThreeSquare::info },
+    'foursquare' => { encrypt => \&four_square_encrypt, decrypt => \&four_square_decrypt, needs_key => 1, info => \&CriptoFEP::FourSquare::info },
+    'redefence' => { encrypt => \&redefence_encrypt, decrypt => \&redefence_decrypt, needs_key => 1, info => \&CriptoFEP::Redefence::info },
+    'route' => { encrypt => \&route_encrypt, decrypt => \&route_decrypt, needs_key => 1, info => \&CriptoFEP::Route::info },
+    'skip' => { encrypt => \&skip_encrypt, decrypt => \&skip_decrypt, needs_key => 1, info => \&CriptoFEP::Skip::info },
+    'turninggrille' => { encrypt => \&turning_grille_encrypt, decrypt => \&turning_grille_decrypt, needs_key => 0, info => \&CriptoFEP::TurningGrille::info },
+    'vic' => { encrypt => \&vic_encrypt, decrypt => \&vic_decrypt, needs_key => 1, info => \&CriptoFEP::VIC::info },
+    'vigenere' => { encrypt => \&vigenere_standard_encrypt, decrypt => \&vigenere_standard_decrypt, needs_key => 1, info => \&CriptoFEP::VigenereStandard::info },
 );
 # --- ENCODING DATA STRUCTURE ---
+# A similar dispatch table for all supported encodings.
 my %encodings = (
     'morse' => { encode => \&morse_encode, decode => \&morse_decode, info => \&CriptoFEP::Morse::info },
     'a1z26' => { encode => \&a1z26_encode, decode => \&a1z26_decode, info => \&CriptoFEP::A1Z26::info },
-	'nato'  => { encode => \&nato_encode,  decode => \&nato_decode, info => \&CriptoFEP::NATO::info  },
-	'tapcode' => { encode => \&tap_code_encode,decode => \&tap_code_decode, info => \&CriptoFEP::TapCode::info},
-	'navajo'  => { encode => \&navajo_encode,  decode => \&navajo_decode, info => \&CriptoFEP::Navajo::info },
-	'altcode' => { encode => \&alt_code_encode,decode => \&alt_code_decode, info => \&CriptoFEP::AltCode::info},
-	't9'      => { encode => \&t9_encode,      decode => \&t9_decode, info => \&CriptoFEP::T9::info },
-	'braillegs8' => { encode => \&braille_encode, decode => \&braille_decode, info => \&CriptoFEP::BrailleGS8::info },
-	'base32'  => { encode => \&base32_encode, decode => \&base32_decode, info => \&CriptoFEP::Base32::info },
-	'base64'  => { encode => \&base64_encode, decode => \&base64_decode, info => \&CriptoFEP::Base64::info },
-	'base16'  => { encode => \&base16_encode, decode => \&base16_decode, info => \&CriptoFEP::Base16::info }, 
-	'base10'   => { encode => \&base10_encode,  decode => \&base10_decode, info => \&CriptoFEP::Base10::info }, 
-	'base8'   => { encode => \&base8_encode,  decode => \&base8_decode, info => \&CriptoFEP::Base8::info }, 
-	'base2'   => { encode => \&base2_encode,  decode => \&base2_decode, info => \&CriptoFEP::Base2::info }, 
-	'hexadecimal'  => { encode => \&base16_encode, decode => \&base16_decode, info => \&CriptoFEP::Base16::info }, 
-	'decimal'   => { encode => \&base10_encode,  decode => \&base10_decode, info => \&CriptoFEP::Base10::info }, 
-	'octal'   => { encode => \&base8_encode,  decode => \&base8_decode, info => \&CriptoFEP::Base8::info }, 
-	'binary'   => { encode => \&base2_encode,  decode => \&base2_decode, info => \&CriptoFEP::Base2::info },
-	'url'     => { encode => \&url_encode,  decode => \&url_decode, info => \&CriptoFEP::UrlEncode::info}, 
+    'nato' => { encode => \&nato_encode, decode => \&nato_decode, info => \&CriptoFEP::NATO::info },
+    'tapcode' => { encode => \&tap_code_encode,decode => \&tap_code_decode, info => \&CriptoFEP::TapCode::info},
+    'navajo' => { encode => \&navajo_encode, decode => \&navajo_decode, info => \&CriptoFEP::Navajo::info },
+    'altcode' => { encode => \&alt_code_encode,decode => \&alt_code_decode, info => \&CriptoFEP::AltCode::info},
+    't9' => { encode => \&t9_encode, decode => \&t9_decode, info => \&CriptoFEP::T9::info },
+    'braillegs8' => { encode => \&braille_encode, decode => \&braille_decode, info => \&CriptoFEP::BrailleGS8::info },
+    'base32' => { encode => \&base32_encode, decode => \&base32_decode, info => \&CriptoFEP::Base32::info },
+    'base64' => { encode => \&base64_encode, decode => \&base64_decode, info => \&CriptoFEP::Base64::info },
+    'base16' => { encode => \&base16_encode, decode => \&base16_decode, info => \&CriptoFEP::Base16::info },
+    'base10' => { encode => \&base10_encode, decode => \&base10_decode, info => \&CriptoFEP::Base10::info },
+    'base8' => { encode => \&base8_encode, decode => \&base8_decode, info => \&CriptoFEP::Base8::info },
+    'base2' => { encode => \&base2_encode, decode => \&base2_decode, info => \&CriptoFEP::Base2::info },
+    'hexadecimal' => { encode => \&base16_encode, decode => \&base16_decode, info => \&CriptoFEP::Base16::info },
+    'decimal' => { encode => \&base10_encode, decode => \&base10_decode, info => \&CriptoFEP::Base10::info },
+    'octal' => { encode => \&base8_encode, decode => \&base8_decode, info => \&CriptoFEP::Base8::info },
+    'binary' => { encode => \&base2_encode, decode => \&base2_decode, info => \&CriptoFEP::Base2::info },
+    'url' => { encode => \&url_encode, decode => \&url_decode, info => \&CriptoFEP::UrlEncode::info},
 );
 
 
@@ -162,26 +165,28 @@ DESCRIPTION
 OPTIONS
     GENERAL:
       -h, --help                 Display this help message and exit.
+      --list-ciphers             Display all ciphers
+      --list-encodings           Display all encodings
       --info                     Display detailed information about a specific cipher or encoding.
       --in <FILE>                Read input text from the specified file.
       --out <FILE>               Write the output to the specified file.
 
     MODE SELECTION (Choose one):
-      -c, --cipher <NAME>        Enter Cipher Mode and specify the cipher to use.
-      -m, --mapping <NAME>       Enter Encoding Mode and specify the mapping to use.
+      -c, --cipher <NAME>      Enter Cipher Mode and specify the cipher to use.
+      -m, --mapping <NAME>     Enter Encoding Mode and specify the mapping to use.
 
     ACTIONS (Choose one per mode):
-      -e,   --encrypt            In Cipher Mode, encrypt the input text.
-      -d,   --decrypt            In Cipher Mode, decrypt the input text.
-      -enc, --encode             In Encoding Mode, encode the input text.
-      -dec, --decode             In Encoding Mode, decode the input text.
+      -e,  --encrypt               In Cipher Mode, encrypt the input text.
+      -d,  --decrypt               In Cipher Mode, decrypt the input text.
+      -enc, --encode                 In Encoding Mode, encode the input text.
+      -dec, --decode                 In Encoding Mode, decode the input text.
 
     CIPHER-SPECIFIC KEYS:
       -k, --key <KEY>            Provide the primary secret key.
       -k2, --key2 <KEY>          Provide the second key (for 'doublecolumnar', 'twosquare', 'foursquare').
       -k3, --key3 <KEY>          Provide the third key (for 'threesquare').
       --grid-key <KEY>           Provide the grid generation key (for 'adfgx', 'adfgvx').
-      --pattern-key <PATTERN>    Provide the pattern key (for 'amsco', e.g., "1221").
+      --pattern-key <PATTERN>  Provide the pattern key (for 'amsco', e.g., "1221").
       --date <DATE>              Provide the date (for 'vic' cipher).
 
 AVAILABLE CIPHERS
@@ -205,14 +210,55 @@ AVAILABLE CIPHERS
 
     # Decode a string using BrailleGS8
     perl $0 -m braillegs8 -dec "⠉⠗⠊⠏⠞⠕⠋⠑⠏"
-	
+    
     # Get information about the Caesar cipher
     perl $0 -c cesar --info
-	
+    
     # Encrypt using the complex VIC cipher
     perl $0 -c vic -e -k \"A SIN TO SIN\" --date \"171025\" \"ATTACK AT DAWN\"
 
 );
+}
+
+# --- LISTING SUBROUTINE ---
+# A "private" function to list algorithms in a formatted table.
+sub _list_algorithms {
+    my ($title, $hash_ref, $has_key_info) = @_;
+
+    print "$title:\n";
+    # Print the table header. The printf function formats text into columns.
+    if ($has_key_info) {
+        printf "%-18s %-15s %s\n", "Name", "Requires Key?", "Description";
+        printf "%-18s %-15s %s\n", "------------------", "---------------", "--------------------------------------------------";
+    } else {
+        printf "%-18s %s\n", "Name", "Description";
+        printf "%-18s %s\n", "------------------", "--------------------------------------------------";
+    }
+
+    # Iterate over all algorithms in the hash, in alphabetical order.
+    foreach my $name (sort keys %{$hash_ref}) {
+        my $info = $hash_ref->{$name};
+        
+        # Extract the first line of the description from each module's info() function.
+        my $description = "No description available.";
+        if ($info->{info}) {
+            my $info_text = $info->{info}->();
+            # This regex captures the first line immediately following "DESCRIPTION:".
+            if ($info_text =~ /DESCRIPTION:\s*\n\s*(.*?)\n/s) {
+                $description = $1;
+                $description =~ s/\.$//; # Remove trailing period for cleaner output.
+            }
+        }
+        
+        # Print the formatted table row.
+        if ($has_key_info) {
+            my $needs_key = $info->{needs_key} ? "Yes" : "No";
+            printf "%-18s %-15s %s\n", $name, $needs_key, $description;
+        } else {
+            printf "%-18s %s\n", $name, $description;
+        }
+    }
+    print "\n";
 }
 
 # --- MAIN LOGIC ---
@@ -220,32 +266,47 @@ AVAILABLE CIPHERS
 my ($cipher_name, $encrypt_flag, $decrypt_flag, $key_input, $key2_input, $key3_input, $grid_key_input, $pattern_key_input, $date_input);
 my ($mapping_name, $encode_flag, $decode_flag);
 my ($file_in, $file_out, $show_help, $info_flag);
+my ($list_ciphers_flag, $list_encodings_flag);
 
-
-# Parse command-line arguments and populate the variables.
+# Parse command-line arguments using Getopt::Long, mapping them to variables.
 GetOptions(
-    'c|cipher=s'   => \$cipher_name,
-    'e|encrypt'    => \$encrypt_flag,
-    'd|decrypt'    => \$decrypt_flag,
-    'k|key=s'      => \$key_input,
-	'k2|key2=s'    => \$key2_input, 
-	'k3|key3=s'    => \$key3_input,
-    'grid-key=s'   => \$grid_key_input,
-	'pattern-key=s'=> \$pattern_key_input,
-    'm|mapping=s'  => \$mapping_name,
-    'enc|encode'       => \$encode_flag,
-    'dec|decode'       => \$decode_flag,
-	'info'       => \$info_flag,
-    'in=s'         => \$file_in,
-    'out=s'        => \$file_out,
-    'h|help'       => \$show_help,
-    'date=s'          => \$date_input,     
+    'c|cipher=s'    => \$cipher_name,
+    'e|encrypt'     => \$encrypt_flag,
+    'd|decrypt'     => \$decrypt_flag,
+    'k|key=s'       => \$key_input,
+    'k2|key2=s'     => \$key2_input,
+    'k3|key3=s'     => \$key3_input,
+    'grid-key=s'    => \$grid_key_input,
+    'pattern-key=s' => \$pattern_key_input,
+    'm|mapping=s'   => \$mapping_name,
+    'enc|encode'        => \$encode_flag,
+    'dec|decode'        => \$decode_flag,
+    'info'          => \$info_flag,
+    'in=s'          => \$file_in,
+    'out=s'         => \$file_out,
+    'h|help'        => \$show_help,
+    'date=s'        => \$date_input,
+    'list-ciphers'    => \$list_ciphers_flag,
+    'list-encodings'  => \$list_encodings_flag,
 );
 
-# Display the banner.
+# Display the application banner on every run.
 banner();
 
-# --- MODE INFO (has priority) ---
+# --- LISTING MODE ---
+# These commands have priority and will exit the program after execution.
+if ($list_ciphers_flag) {
+    _list_algorithms("Available Ciphers", \%ciphers, 1);
+    exit 0;
+}
+elsif ($list_encodings_flag) {
+    _list_algorithms("Available Encodings", \%encodings, 0);
+    exit 0;
+}
+# ----------------------------------------
+
+# --- INFO MODE ---
+# This mode also has priority, displaying help for a specific algorithm.
 if ($info_flag) {
     my $target_name = $cipher_name // $mapping_name;
     die "ERROR: You must specify a cipher (-c) or mapping (-m) to get info about.\n" unless $target_name;
@@ -259,11 +320,12 @@ if ($info_flag) {
     }
 
     if ($info_ref) {
-        print $info_ref->(); # Chama a função info() do módulo
+        # Call the info() subroutine from the respective module.
+        print $info_ref->();
     } else {
         print "No detailed information available for '$target_name'.\n";
     }
-    exit; 
+    exit;
 }
 
 # --- CIPHER MODE ---
@@ -273,13 +335,13 @@ if ($cipher_name) {
     die "ERROR: You must specify an action: --encrypt (-e) or --decrypt (-d).\n" unless $encrypt_flag || $decrypt_flag;
     die "ERROR: --encrypt and --decrypt options cannot be used together.\n" if $encrypt_flag && $decrypt_flag;
     die "ERROR: Cipher '$cipher_name' is unknown.\n" unless exists $ciphers{$cipher_name};
-	
-	# Determine the action and the corresponding function reference from the dispatch table.
+    
+    # Determine the action and the corresponding function reference from the dispatch table.
     my $action = $encrypt_flag ? 'encrypt' : 'decrypt';
     my $cipher_info = $ciphers{$cipher_name};
     my $function_ref = $cipher_info->{$action};
 
-	# --- Get Input Text (from file or command line) ---
+    # --- Get Input Text (from file or command line) ---
     my $text_input;
     if (defined $file_in) {
         open my $fh, '<', $file_in or die "ERROR: Could not open input file '$file_in': $!\n";
@@ -289,53 +351,53 @@ if ($cipher_name) {
         $text_input = shift @ARGV;
     }
     die "ERROR: No input text provided.\n" unless defined $text_input;
-	
-	# Ensure command-line input is treated as UTF-8.
-	$text_input = decode('UTF-8', $text_input) unless defined $file_in;
     
-	# --- Execute Cipher ---
+    # Ensure command-line input is treated as UTF-8.
+    $text_input = decode('UTF-8', $text_input) unless defined $file_in;
+    
+    # --- Execute Cipher ---
     my $final_result;
     my $command_info = "Cipher: $cipher_name, Action: $action";
     
-	# Special handling for ciphers requiring multiple, specific keys.
-	if ($cipher_name eq 'amsco') {
-    die "ERROR: The 'amsco' cipher requires a primary key (-k) and a pattern key (--pattern-key).\n" 
-        unless defined $key_input && defined $pattern_key_input;
-    die "ERROR: The pattern key for 'amsco' must only contain '1's and '2's.\n"
-        if $pattern_key_input =~ /[^12]/;
-    
-    $final_result = $function_ref->($text_input, [$key_input, $pattern_key_input]);
-    $command_info .= ", Key: \"$key_input\", Pattern: \"$pattern_key_input\"";
-	}
-	elsif ($cipher_name eq 'vic') {
+    # Special handling for ciphers requiring multiple, specific keys.
+    if ($cipher_name eq 'amsco') {
+        die "ERROR: The 'amsco' cipher requires a primary key (-k) and a pattern key (--pattern-key).\n" 
+            unless defined $key_input && defined $pattern_key_input;
+        die "ERROR: The pattern key for 'amsco' must only contain '1's and '2's.\n"
+            if $pattern_key_input =~ /[^12]/;
+        
+        $final_result = $function_ref->($text_input, [$key_input, $pattern_key_input]);
+        $command_info .= ", Key: \"$key_input\", Pattern: \"$pattern_key_input\"";
+    }
+    elsif ($cipher_name eq 'vic') {
         die "ERROR: The 'vic' cipher requires a phrase (-k) and a date (--date).\n" 
             unless defined $key_input && defined $date_input;
         $final_result = $function_ref->($text_input, [$key_input, $date_input]);
         $command_info .= ", Phrase: \"$key_input\", Date: \"$date_input\"";
     }
-	elsif ($cipher_name eq 'doublecolumnar' || $cipher_name eq 'twosquare' || $cipher_name eq 'foursquare') {
-    die "ERROR: The '$cipher_name' cipher requires a primary key (-k) and a second key (--key2).\n" 
-        unless defined $key_input && defined $key2_input;
-    # Passamos as duas chaves como uma referência a um array
-    $final_result = $function_ref->($text_input, [$key_input, $key2_input]);
-    $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\"";
-	}
+    elsif ($cipher_name eq 'doublecolumnar' || $cipher_name eq 'twosquare' || $cipher_name eq 'foursquare') {
+        die "ERROR: The '$cipher_name' cipher requires a primary key (-k) and a second key (--key2).\n" 
+            unless defined $key_input && defined $key2_input;
+        # Pass both keys as an array reference.
+        $final_result = $function_ref->($text_input, [$key_input, $key2_input]);
+        $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\"";
+    }
     elsif ($cipher_name eq 'adfgvx' || $cipher_name eq 'adfgx' ) {
         die "ERROR: The '$cipher_name' cipher requires a transposition key (-k) and a grid key (--grid-key).\n" unless defined $key_input && defined $grid_key_input;
         $final_result = $function_ref->($text_input, [$grid_key_input, $key_input]);
         $command_info .= ", Transposition Key: \"$key_input\", Grid Key: \"$grid_key_input\"";
     }
-	elsif ($cipher_name eq 'threesquare') {
-    die "ERROR: The 'threesquare' cipher requires three keys (-k, -k2, -k3).\n" 
-        unless defined $key_input && defined $key2_input && defined $key3_input;
-    
-    $final_result = $function_ref->($text_input, [$key_input, $key2_input, $key3_input]);
-    $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\", Key 3: \"$key3_input\"";
-	}
-	# General handling for all other ciphers that need a single key
+    elsif ($cipher_name eq 'threesquare') {
+        die "ERROR: The 'threesquare' cipher requires three keys (-k, -k2, -k3).\n" 
+            unless defined $key_input && defined $key2_input && defined $key3_input;
+        
+        $final_result = $function_ref->($text_input, [$key_input, $key2_input, $key3_input]);
+        $command_info .= ", Key 1: \"$key_input\", Key 2: \"$key2_input\", Key 3: \"$key3_input\"";
+    }
+    # General handling for all other ciphers that need a single key.
     elsif ($cipher_info->{needs_key}) {
         die "ERROR: The '$cipher_name' cipher requires a key (-k).\n" unless defined $key_input;
-        # Specific key validations
+        # Specific key validations based on the cipher's requirements.
         if ($cipher_name eq 'railfence' || $cipher_name eq 'caesarbox' || $cipher_name eq 'railfence' || $cipher_name eq 'route' || $cipher_name eq 'skip') {
             unless ($key_input =~ /^\d+$/ && $key_input > 1) {
                 die "ERROR: The key for '$cipher_name' must be an integer greater than 1.\n";
@@ -346,22 +408,24 @@ if ($cipher_name) {
                 die "ERROR: The key for 'affine' must be in the format 'a,b'.\n";
             }
         }
-		elsif ($cipher_name eq 'multiplicative') {
+        elsif ($cipher_name eq 'multiplicative') {
             unless ($key_input =~ /^\d+$/ && grep { $_ == $key_input } (1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25)) {
                 die "ERROR: The key for 'multiplicative' cipher must be an integer coprime with 26.\n" .
                     "       Possible values: 1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25.\n";
             }
-		}
+        }
         $final_result = $function_ref->($text_input, $key_input);
         $command_info .= ", Key: \"$key_input\"";
     }
+    # Handling for keyless ciphers.
     else {
         $final_result = $function_ref->($text_input);
     }
     
     print "$command_info\n";
-	
+    
     # --- Output Result ---
+    # Write to a file if --out is specified, otherwise print to the console.
     if (defined $file_out) {
         open my $fh, '>', $file_out or die "ERROR: Could not write to output file '$file_out': $!\n";
         print $fh $final_result; close $fh;
@@ -370,7 +434,6 @@ if ($cipher_name) {
         print "Result => [$final_result]\n\n";
     }
 }
-
 # --- ENCODING MODE ---
 elsif ($mapping_name) {
     # --- Input Validation ---
@@ -378,12 +441,12 @@ elsif ($mapping_name) {
     die "ERROR: --encode and --decode options cannot be used together.\n" if $encode_flag && $decode_flag;
     die "ERROR: Encoding '$mapping_name' is unknown.\n" unless exists $encodings{$mapping_name};
 
-	# Determine action and function reference.
+    # Determine action and function reference.
     my $action = $encode_flag ? 'encode' : 'decode';
     my $mapping_info = $encodings{$mapping_name};
     my $function_ref = $mapping_info->{$action};
     
-	# Get input text.
+    # Get input text.
     my $text_input;
     if (defined $file_in) {
         open my $fh, '<', $file_in or die "ERROR: Could not open input file '$file_in': $!\n";
@@ -393,16 +456,16 @@ elsif ($mapping_name) {
         $text_input = shift @ARGV;
     }
     die "ERROR: No input text provided.\n" unless defined $text_input;
-	
-	$text_input = decode('UTF-8', $text_input) unless defined $file_in;
 
-	# Execute encoding/decoding.
+    $text_input = decode('UTF-8', $text_input) unless defined $file_in;
+
+    # Execute encoding/decoding.
     my $final_result = $function_ref->($text_input);
     my $command_info = "Encoding: $mapping_name, Action: $action";
     
     print "$command_info\n";
     
-	# Output result.
+    # Output result.
     if (defined $file_out) {
         open my $fh, '>', $file_out or die "ERROR: Could not write to output file '$file_out': $!\n";
         print $fh $final_result; close $fh;
@@ -411,7 +474,6 @@ elsif ($mapping_name) {
         print "Result => [$final_result]\n\n";
     }
 }
-
 # --- NO MODE CHOSEN ---
 # If no cipher or mapping was specified, or if -h was used, display help and exit.
 else {
