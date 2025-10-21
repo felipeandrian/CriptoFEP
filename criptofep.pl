@@ -176,19 +176,22 @@ OPTIONS
     MODE SELECTION (Choose one):
       -c, --cipher <NAME>      Enter Cipher Mode and specify the cipher to use.
       -m, --mapping <NAME>     Enter Encoding Mode and specify the mapping to use.
+      -a, --analyze <TOOL>     Select Analysis Mode (e.g., freq, ic, poly-detect).
 
     ACTIONS (Choose one per mode):
       -e,  --encrypt               In Cipher Mode, encrypt the input text.
       -d,  --decrypt               In Cipher Mode, decrypt the input text.
-      -enc, --encode                 In Encoding Mode, encode the input text.
-      -dec, --decode                 In Encoding Mode, decode the input text.
+      -enc, --encode               In Encoding Mode, encode the input text.
+      -dec, --decode               In Encoding Mode, decode the input text.
+      --info                       Display detailed information about the selected algorithm.
+      --lang <lg>                  Specify the language profile for analysis (e.g., en, pt, fr).
 
     CIPHER-SPECIFIC KEYS:
       -k, --key <KEY>            Provide the primary secret key.
       -k2, --key2 <KEY>          Provide the second key (for 'doublecolumnar', 'twosquare', 'foursquare').
       -k3, --key3 <KEY>          Provide the third key (for 'threesquare').
       --grid-key <KEY>           Provide the grid generation key (for 'adfgx', 'adfgvx').
-      --pattern-key <PATTERN>  Provide the pattern key (for 'amsco', e.g., "1221").
+      --pattern-key <PATTERN>    Provide the pattern key (for 'amsco', e.g., "1221").
       --date <DATE>              Provide the date (for 'vic' cipher).
 
 AVAILABLE CIPHERS
