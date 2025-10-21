@@ -59,6 +59,9 @@ use CriptoFEP::Skip qw(skip_encrypt skip_decrypt);
 use CriptoFEP::TurningGrille qw(turning_grille_encrypt turning_grille_decrypt);
 use CriptoFEP::VIC qw(vic_encrypt vic_decrypt);
 use CriptoFEP::VigenereStandard qw(vigenere_standard_encrypt vigenere_standard_decrypt);
+use CriptoFEP::Digrafid qw(digrafid_encrypt digrafid_decrypt);
+use CriptoFEP::Morbit qw(morbit_encrypt morbit_decrypt);
+use CriptoFEP::Affine qw(affine_encrypt affine_decrypt);
 # Encodings (Systems for representing information, no secret key required)
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -76,7 +79,7 @@ use CriptoFEP::Base8 qw(base8_encode base8_decode );
 use CriptoFEP::Base2 qw(base2_encode base2_decode );
 use CriptoFEP::UrlEncode qw(url_encode url_decode);
 #Analysis
-use CriptoFEP::Analyzer qw(analyze_frequency analyze_ic find_key_length);
+use CriptoFEP::Analyzer qw(analyze_frequency analyze_ic find_key_length analyze_ngrams);
 
 # --- CIPHER DATA STRUCTURE ---
 # A hash of hashes that organizes all our ciphers and their functions.
@@ -86,6 +89,7 @@ my %ciphers = (
     'cesar' => { encrypt => \&cesar_encrypt, decrypt => \&cesar_decrypt, needs_key => 0, , info => \&CriptoFEP::Cesar::info },
     'atbash' => { encrypt => \&atbash_cipher, decrypt => \&atbash_cipher, needs_key => 0, , info => \&CriptoFEP::Atbash::info },
     'atbah' => { encrypt => \&atbah_cipher, decrypt => \&atbah_cipher, needs_key => 0, , info => \&CriptoFEP::Atbah::info },
+	'affine' => { encrypt => \&affine_cipher, decrypt => \&affine_cipher, needs_key => 0, , info => \&CriptoFEP::Affine::info },
     'albam' => { encrypt => \&albam_cipher, decrypt => \&albam_cipher, needs_key => 0, info => \&CriptoFEP::Albam::info },
     'scytale' => { encrypt => \&scytale_encrypt, decrypt => \&scytale_decrypt, needs_key => 0, info => \&CriptoFEP::Scytale::info},
     'polybius' => { encrypt => \&polybius_encrypt, decrypt => \&polybius_decrypt, needs_key => 0, info => \&CriptoFEP::Polybius::info },
@@ -116,6 +120,8 @@ my %ciphers = (
     'turninggrille' => { encrypt => \&turning_grille_encrypt, decrypt => \&turning_grille_decrypt, needs_key => 0, info => \&CriptoFEP::TurningGrille::info },
     'vic' => { encrypt => \&vic_encrypt, decrypt => \&vic_decrypt, needs_key => 1, info => \&CriptoFEP::VIC::info },
     'vigenere' => { encrypt => \&vigenere_standard_encrypt, decrypt => \&vigenere_standard_decrypt, needs_key => 1, info => \&CriptoFEP::VigenereStandard::info },
+	'digrafid' => { encrypt => \&digrafid_encrypt, decrypt => \&digrafid_decrypt, needs_key => 1, info => \&CriptoFEP::Digrafid::info },
+	'morbit' => { encrypt => \&morbit_encrypt, decrypt => \&morbit_decrypt, needs_key => 0, info => \&CriptoFEP::Morbit::info },
 );
 # --- ENCODING DATA STRUCTURE ---
 # A similar dispatch table for all supported encodings.
@@ -176,7 +182,7 @@ OPTIONS
     MODE SELECTION (Choose one):
       -c, --cipher <NAME>      Enter Cipher Mode and specify the cipher to use.
       -m, --mapping <NAME>     Enter Encoding Mode and specify the mapping to use.
-      -a, --analyze <TOOL>     Select Analysis Mode (e.g., freq, ic, poly-detect).
+      -a, --analyze <TOOL>     Select Analysis Mode (freq, ic, poly-detect, digram, tigram).
 
     ACTIONS (Choose one per mode):
       -e,  --encrypt               In Cipher Mode, encrypt the input text.
@@ -322,14 +328,22 @@ elsif (defined $analyze_flag) {
     if ($analyze_flag eq 'freq') {
         $analysis_result = analyze_frequency($text_input, $lang_input);
     }
-    elsif ($analyze_flag eq 'ic') { # <-- NOVO BLOCO
+    elsif ($analyze_flag eq 'ic') {
         $analysis_result = analyze_ic($text_input, $lang_input);
     }
-	elsif ($analyze_flag eq 'poly-detect') {
+    elsif ($analyze_flag eq 'poly-detect') {
         $analysis_result = find_key_length($text_input, $lang_input);
     }
+    # --- NOVOS BLOCOS ---
+    elsif ($analyze_flag eq 'digram') {
+        $analysis_result = analyze_ngrams($text_input, 2);
+    }
+    elsif ($analyze_flag eq 'trigram') {
+        $analysis_result = analyze_ngrams($text_input, 3);
+    }
+    # --------------------
     else {
-        die "ERROR: Unknown analysis type '$analyze_flag'. Supported: 'freq', 'ic'.\n";
+        die "ERROR: Unknown analysis type '$analyze_flag'. Supported: 'freq', 'ic', 'poly-detect', 'digram', 'trigram'.\n";
     }
     print $analysis_result;
     exit 0;

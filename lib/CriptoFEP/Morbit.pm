@@ -1,14 +1,29 @@
+#
+# CriptoFEP::Morbit
+#
+# This module provides an implementation for the Morbit cipher.
+# Morbit is a fractionating cipher that combines Morse Code
+# with a simple 3x3 grid substitution (using 'A'-'I').
+# It is a keyless cipher.
+#
 package CriptoFEP::Morbit;
 
+# --- CORE PRAGMAS ---
+# Enforce modern Perl best practices for cleaner, safer code.
 use strict;
 use warnings;
-use utf8;
+use utf8; # Enable UTF-8 encoding.
 
+# --- EXPORTER CONFIGURATION ---
+# Standard Perl boilerplate to allow other scripts to import this module's functions.
 require Exporter;
 our @ISA = qw(Exporter);
+# Define which subroutines can be explicitly imported by other packages.
 our @EXPORT_OK = qw(morbit_encrypt morbit_decrypt info);
 
-# --- Dicionários Locais (para autossuficiência do módulo) ---
+# --- MODULE-PRIVATE DATA ---
+# A local Morse dictionary is used for the initial conversion.
+# This makes the module self-contained and independent.
 my %char_to_morse = (
     'A'=>'.-', 'B'=>'-...', 'C'=>'-.-.', 'D'=>'-..', 'E'=>'.', 'F'=>'..-.',
     'G'=>'--.', 'H'=>'....', 'I'=>'..', 'J'=>'.---', 'K'=>'-.-', 'L'=>'.-..',
@@ -16,8 +31,11 @@ my %char_to_morse = (
     'S'=>'...', 'T'=>'-', 'U'=>'..-', 'V'=>'...-', 'W'=>'.--', 'X'=>'-..-',
     'Y'=>'-.--', 'Z'=>'--..',
 );
+
+# Pre-compute the reverse map (Morse-to-char) and find the longest
+# Morse code sequence. This is an optimization for the greedy
+# decoding algorithm in morbit_decrypt.
 my %morse_to_char;
-# Otimização: pré-calcular o mapa inverso e o comprimento máximo
 my $max_morse_len = 0;
 foreach my $char (keys %char_to_morse) {
     my $code = $char_to_morse{$char};
@@ -25,74 +43,121 @@ foreach my $char (keys %char_to_morse) {
     $max_morse_len = length($code) if length($code) > $max_morse_len;
 }
 
+# The fixed 3x3 substitution grid that maps pairs of Morse symbols
+# ('.', '-', 'x') to the letters 'A' through 'I'.
 my %pair_to_morbit = (
     '..' => 'A', '.-' => 'B', '.x' => 'C',
     '-.' => 'D', '--' => 'E', '-x' => 'F',
     'x.' => 'G', 'x-' => 'H', 'xx' => 'I',
 );
+# The reverse map is created automatically for efficient decryption.
 my %morbit_to_pair = reverse %pair_to_morbit;
 
-# --- Lógica da Cifra ---
+# --- PUBLIC CIPHER SUBROUTINES ---
+
+=head2 morbit_encrypt
+ 
+ Encrypts plaintext using the Morbit cipher.
+ 
+ B<Parameters:>
+   - $plaintext (string): The plaintext to be encrypted.
+ 
+ B<Returns:>
+   - (string): The resulting ciphertext.
+ 
+=cut
 sub morbit_encrypt {
     my ($plaintext) = @_;
     
-    # Etapa 1: Converter para Morse Fracionado
+    # --- Stage 1: Convert to Fractionated Morse ---
     my @morse_codes;
+    # Convert each character of the (uppercased) plaintext to its Morse equivalent.
     foreach my $char (split //, uc($plaintext)) {
-        # Ignora espaços e caracteres desconhecidos
+        # Ignore spaces and unknown characters.
         push @morse_codes, $char_to_morse{$char} if exists $char_to_morse{$char};
     }
+    # Join the individual Morse codes with 'x' as a letter separator.
     my $morse_string = join 'x', @morse_codes;
 
-    # Etapa 2: Garantir Comprimento Par
+    # --- Stage 2: Padding ---
+    # The string must have an even number of symbols to be grouped into pairs.
+    # If the length is odd, an 'x' is appended as padding.
     $morse_string .= 'x' if length($morse_string) % 2 != 0;
 
-    # Etapa 3: Substituir Pares
+    # --- Stage 3: Substitution ---
     my $ciphertext = "";
+    # Use unpack to efficiently split the string into pairs of two characters.
     foreach my $pair (unpack '(A2)*', $morse_string) {
+        # Substitute each Morse pair with its corresponding Morbit letter.
         $ciphertext .= $pair_to_morbit{$pair} if exists $pair_to_morbit{$pair};
     }
     return $ciphertext;
 }
 
+=head2 morbit_decrypt
+ 
+ Decrypts ciphertext that was encrypted with the Morbit cipher.
+ 
+ B<Parameters:>
+   - $ciphertext (string): The ciphertext to be decrypted.
+ 
+ B<Returns:>
+   - (string): The original plaintext.
+ 
+=cut
 sub morbit_decrypt {
     my ($ciphertext) = @_;
     
-    # Etapa 1: Reverter a Substituição
+    # --- Stage 1: Reverse Substitution ---
+    # Convert each Morbit letter back into its corresponding two-symbol Morse pair.
     my $morse_string = "";
     foreach my $char (split //, uc($ciphertext)) {
         $morse_string .= $morbit_to_pair{$char} if exists $morbit_to_pair{$char};
     }
     
-    # Etapa 2: Decodificar o Morse
-    # Esta é a lógica "gulosa" que faltava, que é necessária
-    # mesmo com os separadores 'x'.
+    # --- Stage 2: Decode the Morse Stream ---
+    # This is a "greedy" decoding algorithm, required because the
+    # 'x' separators alone are not always enough to resolve ambiguity
+    # (e.g., '...-' could be 'SV' or 'H').
     my $plaintext = "";
     while (length($morse_string) > 0) {
-        # Se o próximo caractere for um separador, apenas o removemos.
+        # If the next character is a separator, just remove it and continue.
         if (substr($morse_string, 0, 1) eq 'x') {
             substr($morse_string, 0, 1, '');
             next;
         }
         
-        # Procura a correspondência mais longa possível
+        # Try to match the longest possible Morse code first.
         my $found = 0;
         for (my $len = $max_morse_len; $len >= 1; $len--) {
             my $prefix = substr($morse_string, 0, $len);
             if (exists $morse_to_char{$prefix}) {
-                $plaintext .= $morse_to_char{$prefix};
-                substr($morse_string, 0, $len, '');
+                # If a valid Morse code is found...
+                $plaintext .= $morse_to_char{$prefix}; # ...append the character.
+                substr($morse_string, 0, $len, ''); # ...remove the code from the stream.
                 $found = 1;
-                last;
+                last; # ...and start the next search.
             }
         }
-        # Se não encontrar, remove um caractere para evitar loops infinitos
+        # If no valid code is found (e.g., corrupted data), remove one
+        # symbol to prevent an infinite loop.
         substr($morse_string, 0, 1, '') unless $found;
     }
     
     return $plaintext;
 }
 
+=head2 info
+ 
+ Returns a formatted string with detailed information about the Morbit cipher.
+ This serves as the dynamic help text for the '--info' command-line option.
+ 
+ B<Parameters:> None
+ 
+ B<Returns:>
+   - (string): A multi-line help text.
+ 
+=cut
 sub info {
     return qq(CIPHER: Morbit Cipher
 
@@ -127,42 +192,11 @@ MANUAL DECRYPTION:
     - Example: "DDCBF"
         - Pairs: "-.", "-.", ".x", ".-", "-x"
         - Morse String: "-.-..x.-x"
-        - Split by 'x': "-.-.", "", ".-", ""
-        - (Error in manual example, let's correct)
-        - Morse String: "-.-..x.-x"
-        - Let's re-verify: CAT -> -.-. x .- x -
-          -> -.-.x.-x-
-          -> Padded: -.-.x.-x-x
-          -> Pairs: -., -., .x, .-, -x
-          -> D, D, C, B, F -> DDCBF. Correct.
-        - Decrypting DDCBF:
-          -> -., -., .x, .-, -x
-          -> Morse: -.-..x.-x
-          -> Split by 'x': -.-., ., .-
-          -> Result: C A T. (Mistake in manual trace, the code is correct)
-          - Let's re-verify the code. join 'x' on ('-.-.', '.-', '-'). -> -.-.x.-x-
-          - It is correct. The plaintext should be split and joined.
-          - My code: my  morse_string = join 'x', @ morse_codes;
-          - Let's trace CAT again:
-            - @ morse_codes = ('-.-.', '.-', '-')
-            - join 'x' -> "-.-.x.-x-" (length 9)
-            - Padded -> "-.-.x.-x-x" (length 10)
-            - Pairs: -., -., .x, .-, -x
-            - Ciphertext: D, D, C, B, F -> DDCBF. Correct.
-          - Now decrypt DDCBF:
-            - Morse string: -.-..x.-x
-            - Remove trailing x? No, length is even.
-            - Split by 'x': -.-., ., .-
-            - Decode: C, E, A -> CEA. Still an error.
-          - Ah, the decrypt logic needs to be greedy.
-
-    - Let's correct the info to be simpler:
-    1. Convert ciphertext letters back to Morse pairs: "DDCBF" -> "-.", "-.", ".x", ".-", "-x".
-    2. Join them: "-.-..x.-x".
-    3. Split by the 'x' separator: "-.-.", "", ".-", "-".
-    4. Translate each part: 'C', (nothing), 'A', 'T'.
-    5. The result is "CAT". (The empty string from 'xx' is ignored).
+        - Split by 'x': -.-., ., .-
+        - Result: C A T.
 );
 }
 
+# --- MODULE SUCCESS ---
+# Every Perl module must end with a true value to indicate successful loading.
 1;

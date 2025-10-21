@@ -1,14 +1,26 @@
+#
+# CriptoFEP::Albam
+#
+# This module provides the implementation for the Albam cipher, a simple
+# reciprocal substitution cipher that swaps the two halves of the alphabet.
+# It is functionally identical to the ROT13 cipher.
+#
 package CriptoFEP::Albam;
 
+# --- CORE PRAGMAS ---
+# Enforce modern Perl best practices for cleaner, safer code.
 use strict;
 use warnings;
 use utf8;
 
 # --- MODULE IMPORTS ---
+# Add the parent 'lib' directory to Perl's search path to find our custom modules.
 use lib 'lib';
+# Import shared utilities for text normalization.
 use CriptoFEP::Utils qw(normalize_text);
 
 # --- EXPORTER CONFIGURATION ---
+# Standard Perl boilerplate to allow other scripts to import this module's functions.
 require Exporter;
 our @ISA = qw(Exporter);
 # Add 'info' to the list of functions that can be exported.
@@ -16,11 +28,28 @@ our @EXPORT_OK = qw(albam_cipher info);
 
 # --- CIPHER LOGIC ---
 
+=head2 albam_cipher
+ 
+ Performs the Albam substitution on a given text.
+ Since Albam is a reciprocal (involutory) cipher, this single function
+ handles both encryption and decryption.
+ 
+ B<Parameters:>
+   - $text (string): The plaintext (or ciphertext) to be transformed.
+ 
+ B<Returns:>
+   - (string): The resulting ciphertext (or plaintext).
+ 
+=cut
 sub albam_cipher {
     my ($text) = @_;
+    # Sanitize the input to uppercase A-Z characters only.
     my $normalized_text = normalize_text($text);
     my $output = "";
 
+    # The Albam map is a fixed, keyless substitution.
+    # It maps the first half of the alphabet (A-M) to the second (N-Z)
+    # and vice-versa. This is identical to a ROT13 operation.
     my %albam_map = (
         'A' => 'N', 'B' => 'O', 'C' => 'P', 'D' => 'Q', 'E' => 'R', 'F' => 'S',
         'G' => 'T', 'H' => 'U', 'I' => 'V', 'J' => 'W', 'K' => 'X', 'L' => 'Y',
@@ -29,6 +58,7 @@ sub albam_cipher {
         'Y' => 'L', 'Z' => 'M',
     );
 
+    # Iterate over each character and substitute it using the map.
     foreach my $char (split //, $normalized_text) {
         $output .= $albam_map{$char} if exists $albam_map{$char};
     }
@@ -38,6 +68,17 @@ sub albam_cipher {
 
 # --- DOCUMENTATION SUBROUTINE ---
 
+=head2 info
+ 
+ Returns a formatted string with detailed information about the Albam cipher.
+ This serves as the dynamic help text for the '--info' command-line option.
+ 
+ B<Parameters:> None
+ 
+ B<Returns:>
+   - (string): A multi-line help text.
+ 
+=cut
 sub info {
     return qq(CIPHER: Albam Cipher
 
@@ -69,4 +110,5 @@ MANUAL DECRYPTION:
 }
 
 # --- MODULE SUCCESS ---
+# Every Perl module must end with a true value to indicate successful loading.
 1;

@@ -1,27 +1,54 @@
+#
+# CriptoFEP::Atbash
+#
+# This module provides the implementation for the Atbash cipher, a simple
+# reciprocal substitution cipher that reverses the alphabet.
+#
 package CriptoFEP::Atbash;
 
+# --- CORE PRAGMAS ---
+# Enforce modern Perl best practices for cleaner, safer code.
 use strict;
 use warnings;
 
 # --- MODULE IMPORTS ---
+# Add the parent 'lib' directory to Perl's search path.
 use lib 'lib';
+# Import shared utilities for text normalization.
 use CriptoFEP::Utils qw(normalize_text);
 
 # --- EXPORTER CONFIGURATION ---
+# Standard Perl boilerplate to allow other scripts to import this module's functions.
 require Exporter;
 our @ISA = qw(Exporter);
 # Add 'info' to the list of functions that can be exported.
+# Define which subroutines can be explicitly imported by other packages.
 our @EXPORT_OK = qw(atbash_cipher info);
 
 # --- CIPHER LOGIC ---
 
+=head2 atbash_cipher
+ 
+ Performs the Atbash substitution on a given text.
+ Since Atbash is a reciprocal (involutory) cipher, this single function
+ handles both encryption and decryption.
+ 
+ B<Parameters:>
+   - $text (string): The plaintext (or ciphertext) to be transformed.
+ 
+ B<Returns:>
+   - (string): The resulting ciphertext (or plaintext).
+ 
+=cut
 sub atbash_cipher {
     my ($text) = @_;
+    # Sanitize the input to uppercase A-Z characters only.
     my $normalized_text = normalize_text($text);
     
     # This is a highly efficient way to reverse the alphabet.
-    # It transliterates characters from the first set (A-Z) to the
-    # corresponding character in the second set (Z-A).
+    # The tr/// (transliteration) operator is a built-in Perl function
+    # that swaps characters from the first set (A-Z) to the
+    # corresponding character in the second set (Z-A) in a single operation.
     $normalized_text =~ tr/ABCDEFGHIJKLMNOPQRSTUVWXYZ/ZYXWVUTSRQPONMLKJIHGFEDCBA/;
     
     return $normalized_text;
@@ -29,6 +56,17 @@ sub atbash_cipher {
 
 # --- DOCUMENTATION SUBROUTINE ---
 
+=head2 info
+ 
+ Returns a formatted string with detailed information about the Atbash cipher.
+ This serves as the dynamic help text for the '--info' command-line option.
+ 
+ B<Parameters:> None
+ 
+ B<Returns:>
+   - (string): A multi-line help text.
+ 
+=cut
 sub info {
     return qq(CIPHER: Atbash Cipher
 
@@ -68,4 +106,5 @@ CURIOSITY:
 }
 
 # --- MODULE SUCCESS ---
+# Every Perl module must end with a true value to indicate successful loading.
 1;
