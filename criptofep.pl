@@ -81,7 +81,7 @@ use CriptoFEP::Base8 qw(base8_encode base8_decode );
 use CriptoFEP::Base2 qw(base2_encode base2_decode );
 use CriptoFEP::UrlEncode qw(url_encode url_decode);
 #Analysis
-use CriptoFEP::Analyzer qw(analyze_frequency analyze_ic find_key_length analyze_ngrams);
+use CriptoFEP::Analyzer qw(analyze_frequency analyze_ic find_key_length analyze_ngrams poly_solve);
 
 # --- CIPHER DATA STRUCTURE ---
 # A hash of hashes that organizes all our ciphers and their functions.
@@ -186,7 +186,7 @@ OPTIONS
     MODE SELECTION (Choose one):
       -c, --cipher <NAME>      Enter Cipher Mode and specify the cipher to use.
       -m, --mapping <NAME>     Enter Encoding Mode and specify the mapping to use.
-      -a, --analyze <TOOL>     Select Analysis Mode (freq, ic, poly-detect, digram, tigram).
+      -a, --analyze <TOOL>     Select Analysis Mode (freq, ic, poly-detect, digram, tigram, poly-solve).
 
     ACTIONS (Choose one per mode):
       -e,  --encrypt               In Cipher Mode, encrypt the input text.
@@ -285,6 +285,7 @@ my ($file_in, $file_out, $show_help, $info_flag);
 my ($list_ciphers_flag, $list_encodings_flag);
 my ($analyze_flag, $lang_input);
 my $validate_key_cipher;
+my $klen_input;
 
 # Parse command-line arguments using Getopt::Long, mapping them to variables.
 GetOptions(
@@ -309,6 +310,7 @@ GetOptions(
 	'a|analyze=s'      => \$analyze_flag,   
     'lang=s'           => \$lang_input,
 	'validate-key=s'   => \$validate_key_cipher,
+	'klen=i'           => \$klen_input,
 );
 
 # Display the application banner on every run.
@@ -357,14 +359,17 @@ elsif (defined $analyze_flag) {
     elsif ($analyze_flag eq 'poly-detect') {
         $analysis_result = find_key_length($text_input, $lang_input);
     }
-    # --- NOVOS BLOCOS ---
     elsif ($analyze_flag eq 'digram') {
         $analysis_result = analyze_ngrams($text_input, 2);
     }
     elsif ($analyze_flag eq 'trigram') {
         $analysis_result = analyze_ngrams($text_input, 3);
     }
-    # --------------------
+	elsif ($analyze_flag eq 'poly-solve') {
+        die "ERROR: The 'poly-solve' analysis requires a key length (ex: --klen 5).\n" 
+            unless defined $klen_input;
+        $analysis_result = poly_solve($text_input, $klen_input, $lang_input);
+    }
     else {
         die "ERROR: Unknown analysis type '$analyze_flag'. Supported: 'freq', 'ic', 'poly-detect', 'digram', 'trigram'.\n";
     }

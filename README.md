@@ -147,6 +147,7 @@ This is the complete list of algorithms and tools currently supported by CriptoF
 | **poly-detect**| Analyzes text to find the most probable key length of a polyalphabetic cipher.        |
 | **digram**     | Performs a frequency analysis on letter pairs (digrams).                              |
 | **trigram**    | Performs a frequency analysis on letter trios (trigrams).                             |
+| **poly-solve** | Attempts to find the key for a polyalphabetic cipher given a key length.              |
 
 </details>
 
@@ -211,12 +212,12 @@ perl criptofep.pl --validate-key <cipher> <key>
 
 #### **Mode Selection (Choose ONE)**
 
-| Option                  | Description                                                   |
-| ----------------------- | --------------------------------------------------------------|
-| `-c`, `--cipher <NAME>` | Selects **Cipher Mode** and specifies the cipher.             |
-| `-m`, `--mapping <NAME>`| Selects **Encoding Mode** and specifies the mapping.          |
-| `-a`, `--analyze <TOOL>`| Select **Analysis Mode** (e.g., `freq`, `ic`, `poly-detect`). |
-| `--validate-key <NAME>` |	Select Utility Mode to validate a key (e.g., hill).           |
+| Option                  | Description                                                                |
+| ----------------------- | ---------------------------------------------------------------------------|
+| `-c`, `--cipher <NAME>` | Selects **Cipher Mode** and specifies the cipher.                          |
+| `-m`, `--mapping <NAME>`| Selects **Encoding Mode** and specifies the mapping.                       |
+| `-a`, `--analyze <TOOL>`| Select **Analysis Mode** (e.g., `freq`, `ic`, `poly-detect`,`poly-solve`). |
+| `--validate-key <NAME>` |	Select Utility Mode to validate a key (e.g., hill).                        |
 
 #### **Actions (Choose ONE per mode)**
 
@@ -228,6 +229,7 @@ perl criptofep.pl --validate-key <cipher> <key>
 | `-dec`,`--decode` | Encoding mode Decode the input text.                                |
 | `--info`          | Display detailed information about the selected algorithm.          |
 | `--lang <lg>`     | Specify the language profile for analysis (e.g., `en`, `pt`, `fr`). |
+| `--klen <LEN>`	| Specify the key length (required for poly-solve).                   |
 
 #### **Cipher-Specific Keys**
 
@@ -278,6 +280,23 @@ perl criptofep.pl -m nato --encode --in message.txt --out nato_encoded.txt
 perl criptofep.pl -c playfair --info
 ```
 
+**7. Break a Vigenère Cipher (Two-Step Attack)**
+
+Step 1: Find the key length with poly-detect.
+
+```bash
+perl criptofep.pl -a poly-detect "GZTZIWTTZBVVMPMVVLJRIVEXSOTUDXCZLZXTHSMIRLTDHCZPVVCXUZSPVSNSVLSOIFVIIH
+KJEYIEVIIGKKEIGKHPJWUHFPREPOIETIEH"
+```
+(Output: ...The most probable fundamental key length is 5.)
+
+Step 2: Solve for the key using the length you found.
+
+```bash
+perl criptofep.pl -a poly-solve -klen 5 "GZTZIWTTZBVVMPMVVLJRIVEXSOTUDXCZLZXTHSMIRLTDHCZPVVCXUZSPVSNSVLSOIFVIIH
+KJEYIEVIIGKKEIGKHPJWUHFPREPOIETIEH"
+```
+(Output: ...The most probable key is 'CHAVE'.)
 -----
 
 ## 📂 Project Structure
