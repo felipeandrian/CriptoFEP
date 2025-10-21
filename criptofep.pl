@@ -345,10 +345,21 @@ elsif (defined $validate_key_cipher) {
 }
 
 elsif (defined $analyze_flag) {
-    my $text_input = shift @ARGV;
+    
+    # --- CORREÇÃO: LÓGICA DE ENTRADA UNIFICADA ---
+    my $text_input;
+    if (defined $file_in) {
+        open my $fh, '<', $file_in or die "ERROR: Could not open input file '$file_in': $!\n";
+        read $fh, $text_input, -s $fh; close $fh;
+		chomp($text_input);
+        print "Read from file: '$file_in'\n";
+    } else {
+        $text_input = shift @ARGV;
+    }
     die "ERROR: No input text provided for analysis.\n" unless defined $text_input;
-    $text_input = decode('UTF-8', $text_input);
-
+    $text_input = decode('UTF-8', $text_input) unless defined $file_in;
+    # --- FIM DA CORREÇÃO ---
+    
     my $analysis_result;
     if ($analyze_flag eq 'freq') {
         $analysis_result = analyze_frequency($text_input, $lang_input);
@@ -365,13 +376,13 @@ elsif (defined $analyze_flag) {
     elsif ($analyze_flag eq 'trigram') {
         $analysis_result = analyze_ngrams($text_input, 3);
     }
-	elsif ($analyze_flag eq 'poly-solve') {
+    elsif ($analyze_flag eq 'poly-solve') {
         die "ERROR: The 'poly-solve' analysis requires a key length (ex: --klen 5).\n" 
             unless defined $klen_input;
         $analysis_result = poly_solve($text_input, $klen_input, $lang_input);
     }
     else {
-        die "ERROR: Unknown analysis type '$analyze_flag'. Supported: 'freq', 'ic', 'poly-detect', 'digram', 'trigram'.\n";
+        die "ERROR: Unknown analysis type '$analyze_flag'. Supported: 'freq', 'ic', 'poly-detect', 'digram', 'trigram', 'poly-solve'.\n";
     }
     print $analysis_result;
     exit 0;
@@ -418,6 +429,7 @@ if ($cipher_name) {
     if (defined $file_in) {
         open my $fh, '<', $file_in or die "ERROR: Could not open input file '$file_in': $!\n";
         read $fh, $text_input, -s $fh; close $fh;
+		chomp($text_input);
         print "Read from file: '$file_in'\n";
     } else {
         $text_input = shift @ARGV;
@@ -523,6 +535,7 @@ elsif ($mapping_name) {
     if (defined $file_in) {
         open my $fh, '<', $file_in or die "ERROR: Could not open input file '$file_in': $!\n";
         read $fh, $text_input, -s $fh; close $fh;
+		chomp($text_input);
         print "Read from file: '$file_in'\n";
     } else {
         $text_input = shift @ARGV;
