@@ -3,11 +3,11 @@
 #
 # This module provides shared helper functions and global data structures
 # used by multiple cipher and encoding modules within the CriptoFEP toolkit.
-# It centralizes common logic, such as text normalization and alphabet mapping,
-# to ensure consistency and reduce code duplication.
+# It centralizes common logic, such as text normalization, alphabet mapping,
+# and modular arithmetic, to ensure consistency and reduce code duplication.
 #
 
-# Declares the "full name" of this module. Corresponds to the file path.
+# Declares the package namespace, corresponding to the file path.
 package CriptoFEP::Utils;
 
 # --- CORE PRAGMAS ---
@@ -25,7 +25,7 @@ our @ISA = qw(Exporter);
 
 # List the functions and variables this module will "export" (make available)
 # to other modules that 'use' it.
-our @EXPORT_OK = qw(normalize_text $alphabet_list_ref $alphabet_map_ref);
+our @EXPORT_OK = qw(normalize_text $alphabet_list_ref $alphabet_map_ref mod_inverse);
 
 # --- Global Definitions ---
 
@@ -83,6 +83,65 @@ sub normalize_text {
     $text =~ s/[^A-Z]//g; 
     
     return $text;
+}
+
+# --- Mathematical Helper Functions ---
+
+=head2 _extended_gcd
+ 
+ Internal helper function implementing the Extended Euclidean Algorithm.
+ It is used to find the greatest common divisor (gcd) of two integers 'a'
+ and 'b', and also finds two integers 'x' and 'y' such that
+ a*x + b*y = gcd(a, b). This is essential for finding modular inverses.
+ 
+ B<Parameters:>
+   - $a (integer): The first integer.
+   - $b (integer): The second integer.
+ 
+ B<Returns:>
+   - A list (gcd, x, y).
+ 
+=cut
+sub _extended_gcd {
+    my ($a, $b) = @_;
+    if ($b == 0) {
+        # Base case for the recursion
+        return ($a, 1, 0);
+    } else {
+        # Recursive step
+        my ($gcd, $x, $y) = _extended_gcd($b, $a % $b);
+        return ($gcd, $y, $x - int($a / $b) * $y);
+    }
+}
+
+=head2 mod_inverse
+ 
+ Public function to find the modular multiplicative inverse.
+ It finds an integer 'x' such that (a * x) % m == 1.
+ 
+ B<Parameters:>
+   - $a (integer): The number to find the inverse of.
+   - $m (integer): The modulus.
+ 
+ B<Returns:>
+   - (integer): The modular inverse 'x', if it exists.
+   - (undef): If no inverse exists (i.e., 'a' and 'm' are not coprime).
+ 
+=cut
+# Main function to find the Modular Multiplicative Inverse
+# Finds 'x' such that (a*x) % m == 1
+sub mod_inverse {
+    my ($a, $m) = @_;
+    # Call the helper to get the gcd and coefficients.
+    my ($gcd, $x, $y) = _extended_gcd($a, $m);
+    
+    if ($gcd != 1) {
+        # No inverse exists! This is crucial for the Hill Cipher and Affine Cipher.
+        return undef; 
+    } else {
+        # Ensure the result is positive within the modulus range [0, m-1].
+        return ($x % $m + $m) % $m;
+    }
 }
 
 # --- MODULE SUCCESS ---

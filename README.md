@@ -86,6 +86,7 @@ This is the complete list of algorithms and tools currently supported by CriptoF
 | **Digrafid**       |      Yes      | An advanced fractionating cipher operating on digraphs with a 25x25 grid.  |
 | **Double Columnar**|      Yes      | Applies the Columnar Transposition cipher twice for enhanced security.     |
 | **Four-Square**    |      Yes      | A polygraphic cipher using four 5x5 grids to encrypt digraphs.             |
+| **Hill**           |      Yes      | A polygraphic cipher using linear algebra (matrix multiplication).         |
 | **Keyboard Shift** |      No       | A substitution cipher based on shifting keys on a QWERTY keyboard.         |
 | **Morbit**         |      No       | A fractionating cipher that combines Morse code with a simple 3x3 grid.    |
 | **Multiplicative** |      Yes      | A mathematical substitution cipher using `(ax) mod 26`.                    |
@@ -144,6 +145,8 @@ This is the complete list of algorithms and tools currently supported by CriptoF
 | **freq**       | Performs a full frequency analysis of a text, suggesting likely letter substitutions. |
 | **ic**         | Calculates the **Index of Coincidence (IC)** to help identify the cipher type.        |
 | **poly-detect**| Analyzes text to find the most probable key length of a polyalphabetic cipher.        |
+| **digram**     | Performs a frequency analysis on letter pairs (digrams).                              |
+| **trigram**    | Performs a frequency analysis on letter trios (trigrams).                             |
 
 </details>
 
@@ -189,6 +192,9 @@ perl criptofep.pl -m <mapping> [--encode|--decode] ["text" | --in <file>]
 
 # Analysis Mode (for cryptanalysis tools)
 perl criptofep.pl -a <tool> [--lang <lg>] ["text" | --in <file>]
+
+# Utility Mode (for helper tools)
+perl criptofep.pl --validate-key <cipher> <key>
 ```
 
 ### Command-Line Options
@@ -210,6 +216,7 @@ perl criptofep.pl -a <tool> [--lang <lg>] ["text" | --in <file>]
 | `-c`, `--cipher <NAME>` | Selects **Cipher Mode** and specifies the cipher.             |
 | `-m`, `--mapping <NAME>`| Selects **Encoding Mode** and specifies the mapping.          |
 | `-a`, `--analyze <TOOL>`| Select **Analysis Mode** (e.g., `freq`, `ic`, `poly-detect`). |
+| `--validate-key <NAME>` |	Select Utility Mode to validate a key (e.g., hill).           |
 
 #### **Actions (Choose ONE per mode)**
 

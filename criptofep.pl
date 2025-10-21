@@ -63,6 +63,7 @@ use CriptoFEP::Digrafid qw(digrafid_encrypt digrafid_decrypt);
 use CriptoFEP::Morbit qw(morbit_encrypt morbit_decrypt);
 use CriptoFEP::Affine qw(affine_encrypt affine_decrypt);
 use CriptoFEP::Beaufort qw(beaufort_cipher);
+use CriptoFEP::Hill qw(hill_encrypt hill_decrypt hill_validate_key);
 # Encodings (Systems for representing information, no secret key required)
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -124,6 +125,7 @@ my %ciphers = (
 	'digrafid' => { encrypt => \&digrafid_encrypt, decrypt => \&digrafid_decrypt, needs_key => 1, info => \&CriptoFEP::Digrafid::info },
 	'morbit' => { encrypt => \&morbit_encrypt, decrypt => \&morbit_decrypt, needs_key => 0, info => \&CriptoFEP::Morbit::info },
 	'beaufort' => { encrypt => \&beaufort_cipher, decrypt => \&beaufort_cipher, needs_key => 1, info => \&CriptoFEP::Beaufort::info },	
+	'hill' => { encrypt => \&hill_encrypt, decrypt => \&hill_decrypt, needs_key => 1, info => \&CriptoFEP::Hill::info },
 );
 # --- ENCODING DATA STRUCTURE ---
 # A similar dispatch table for all supported encodings.
@@ -200,6 +202,7 @@ OPTIONS
       -k3, --key3 <KEY>          Provide the third key (for 'threesquare').
       --grid-key <KEY>           Provide the grid generation key (for 'adfgx', 'adfgvx').
       --pattern-key <PATTERN>    Provide the pattern key (for 'amsco', e.g., "1221").
+      --validate-key hill <KEY>  Validate key for hill(e.g., --validate-key hill "ABCF").
       --date <DATE>              Provide the date (for 'vic' cipher).
 
 AVAILABLE CIPHERS
@@ -281,6 +284,7 @@ my ($mapping_name, $encode_flag, $decode_flag);
 my ($file_in, $file_out, $show_help, $info_flag);
 my ($list_ciphers_flag, $list_encodings_flag);
 my ($analyze_flag, $lang_input);
+my $validate_key_cipher;
 
 # Parse command-line arguments using Getopt::Long, mapping them to variables.
 GetOptions(
@@ -304,6 +308,7 @@ GetOptions(
     'list-encodings'  => \$list_encodings_flag,
 	'a|analyze=s'      => \$analyze_flag,   
     'lang=s'           => \$lang_input,
+	'validate-key=s'   => \$validate_key_cipher,
 );
 
 # Display the application banner on every run.
@@ -320,6 +325,22 @@ elsif ($list_encodings_flag) {
     exit 0;
 }
 # ----------------------------------------
+
+elsif (defined $validate_key_cipher) {
+    my $key_to_validate = shift @ARGV;
+    die "ERROR: No key provided for validation.\n" unless defined $key_to_validate;
+    $key_to_validate = decode('UTF-8', $key_to_validate);
+
+    my $result;
+    if (lc($validate_key_cipher) eq 'hill') {
+        $result = hill_validate_key($key_to_validate);
+    }
+    else {
+        die "ERROR: Key validation for '$validate_key_cipher' is not supported (yet).\n";
+    }
+    print $result;
+    exit 0;
+}
 
 elsif (defined $analyze_flag) {
     my $text_input = shift @ARGV;
