@@ -1,14 +1,14 @@
 
 <div align="center">
   <img src="CriptoFEP.png" alt="CriptoFEP Logo" width="120">
-  <h1>CriptoFEP — A Classic Cipher Toolkit</h1>
+  <h1>CriptoFEP — A Classic Cipher & Analysis Toolkit</h1>
 </div>
 
 <div align="center">
 
 [![Build Status](https://img.shields.io/badge/build-passing-green?style=flat-square&logo=github)]()
-[![Coverage](https://img.shields.io/badge/coverage-95%2B%25-brightgreen?style=flat-square)]()
-[![Version](https://img.shields.io/badge/version-1.1.0-blue?style=flat-square)]()
+[![Coverage](https://img.shields.io/badge/coverage-in%20progress-yellow?style=flat-square)]()
+[![Version](https://img.shields.io/badge/version-1.3.0-blue?style=flat-square)]()
 [![Perl](https://img.shields.io/badge/perl-v5.10+-black?style=flat-square&logo=perl)]()
 [![License](https://img.shields.io/badge/license-MIT-darkgreen?style=flat-square)]()
 
@@ -26,14 +26,14 @@
 
 </div>
 
-**CriptoFEP** is a powerful, educational, and modular command-line toolkit written in **Perl** for experimenting with classic cryptography. It provides a comprehensive arsenal of historical ciphers and modern encodings, making it the perfect tool for students, historians, puzzle enthusiasts, and Capture The Flag (CTF) competitors.
+**CriptoFEP** is a powerful, educational, and modular command-line toolkit written in **Perl** for experimenting with classic cryptography. It provides a comprehensive arsenal of historical ciphers, modern encodings, and **cryptanalysis tools**, making it the perfect companion for students, historians, puzzle enthusiasts, and Capture The Flag (CTF) competitors.
 
 ---
 
 ## 📋 Table of Contents
 
 - [✨ Core Features](#-core-features)
-- [📚 Available Ciphers & Encodings](#-available-ciphers--encodings)
+- [📚 Available Algorithms & Tools](#-available-algorithms--tools)
 - [🚀 Quick Start](#-quick-start)
 - [🛠️ Usage Guide](#️-usage-guide)
   - [Synopsis](#synopsis)
@@ -48,21 +48,25 @@
 
 ## ✨ Core Features
 
-- **Extensive Library**: A vast collection of over 30 classic ciphers and 10+ standard encodings.
-- **Dual Modes**: Intelligently separates **Ciphers** (for secrecy) from **Encodings** (for representation).
+- **Extensive Library**: A vast collection of over 30 classic ciphers and 15+ standard encodings.
+- **Triple Modes**: Intelligently separates **Ciphers** (secrecy), **Encodings** (representation), and **Analysis** (cryptanalysis).
+- **Cryptanalysis Suite**: Includes tools like Frequency Analysis, Index of Coincidence (IC), and a Polyalphabetic Key Length Detector.
 - **Professional CLI**: A robust and intuitive command-line interface with clear, consistent options.
-- **File I/O**: Seamlessly encrypts/encodes direct text input or entire files, with output to the terminal or a new file.
+- **File I/O**: Seamlessly processes direct text input or entire files.
 - **Full Unicode Support**: Correctly handles a wide range of characters thanks to its UTF-8 architecture.
-- **Dynamic Help**: An integrated `--info` flag provides detailed historical and technical explanations for each algorithm.
-- **Modular & Extensible**: Built with a clean, modular architecture in `lib/CriptoFEP/`, making it easy to maintain and extend with new ciphers.
+- **Dynamic Help & Listing**: Integrated `--info`, `--list-ciphers`, and `--list-encodings` flags provide detailed explanations.
+- **Modular & Extensible**: Built with a clean architecture in `lib/CriptoFEP/`, making it easy to maintain and extend.
 
 ---
 
-## 📚 Available Ciphers & Encodings
+## 📚 Available Algorithms & Tools
 
-This is the complete list of algorithms currently supported by CriptoFEP.
+This is the complete list of algorithms and tools currently supported by CriptoFEP.
 
-### Ciphers (Key-based algorithms for confidentiality)
+<details>
+<summary><strong>Click to expand the full list of 30+ Ciphers</strong></summary>
+
+### Ciphers (Algorithms for confidentiality)
 
 | Name               | Requires Key? | Description                                                                |
 | -------------------| :-----------: | ---------------------------------------------------------------------------|
@@ -74,6 +78,7 @@ This is the complete list of algorithms currently supported by CriptoFEP.
 | **Atbah**          |      No       | A simple substitution cipher with a specific, non-sequential mapping.      |
 | **Atbash**         |      No       | A simple substitution cipher that reverses the alphabet (A=Z, B=Y...).     |
 | **Bacon**          |      No       | A 5-bit binary encoding that maps letters to sequences of 'A's and 'B's.   |
+| **Beaufort**       |      Yes      | A reciprocal polyalphabetic cipher, similar to Vigenere (C = K - P).       |
 | **Bifid**          |      Yes      | A fractionating cipher combining Polybius with transposition.              |
 | **Caesar**         |      No       | The classic shift cipher (fixed shift of 3).                               |
 | **Caesar Box**     |      Yes      | A simple columnar transposition where columns are read in natural order.   |
@@ -81,6 +86,7 @@ This is the complete list of algorithms currently supported by CriptoFEP.
 | **Digrafid**       |      Yes      | An advanced fractionating cipher operating on digraphs with a 25x25 grid.  |
 | **Double Columnar**|      Yes      | Applies the Columnar Transposition cipher twice for enhanced security.     |
 | **Four-Square**    |      Yes      | A polygraphic cipher using four 5x5 grids to encrypt digraphs.             |
+| **Hill**           |      Yes      | A polygraphic cipher using linear algebra (matrix multiplication).         |
 | **Keyboard Shift** |      No       | A substitution cipher based on shifting keys on a QWERTY keyboard.         |
 | **Morbit**         |      No       | A fractionating cipher that combines Morse code with a simple 3x3 grid.    |
 | **Multiplicative** |      Yes      | A mathematical substitution cipher using `(ax) mod 26`.                    |
@@ -99,9 +105,14 @@ This is the complete list of algorithms currently supported by CriptoFEP.
 | **Turning Grille** |      No       | A transposition cipher using a rotating stencil with a fixed 6x6 grid.     |
 | **Two-Square**     |      Yes      | A polygraphic cipher using two 5x5 grids.                                  |
 | **VIC**            |      Yes      | A highly complex Cold War spy cipher.                                      |
-| **Vigenère**       |      Yes      | A polyalphabetic cipher using a keyword (Autokey variant).                 |
+| **Vigenère(auto)** |      Yes      | The more secure "Autokey" variant of the Vigenère cipher.                  |
+| **Vigenère**       |      Yes      | The classic polyalphabetic cipher using a repeating keyword.               |
 | **XOR**            |      Yes      | A modern, bitwise symmetric cipher.                                        |
 
+</details>
+
+<details>
+<summary><strong>Click to expand the full list of 15+ Encodings</strong></summary>
 
 ### Encodings (Standard, keyless mappings for representation)
 
@@ -122,23 +133,46 @@ This is the complete list of algorithms currently supported by CriptoFEP.
 | **Tap Code**| A Polybius-based code transmitted via taps, used by prisoners.            |
 | **URL**     | Encodes unsafe characters for use in a URL (Percent-Encoding).            |
 
+</details>
+
+<details>
+<summary><strong>Click to expand the full list of Cryptanalysis Tools</strong></summary>
+
+### Cryptanalysis Tools (Tools for analyzing and breaking ciphers)
+
+|       Tool     |                                     Description                                       |
+| :------------- | :------------------------------------------------------------------------------------ |
+| **freq**       | Performs a full frequency analysis of a text, suggesting likely letter substitutions. |
+| **ic**         | Calculates the **Index of Coincidence (IC)** to help identify the cipher type.        |
+| **poly-detect**| Analyzes text to find the most probable key length of a polyalphabetic cipher.        |
+| **digram**     | Performs a frequency analysis on letter pairs (digrams).                              |
+| **trigram**    | Performs a frequency analysis on letter trios (trigrams).                             |
+
+</details>
+
 ---
 
 ## 🚀 Quick Start
 
 **1. Clone the Repository**
-
 ```bash
-git clone https://github.com/felipeandrian/CriptoFEP.git
+git clone [https://github.com/felipeandrian/CriptoFEP.git](https://github.com/felipeandrian/CriptoFEP.git)
 cd CriptoFEP
 ````
 
 **2. Display the Help Message**
-
-The first command you should run is `-h` to see all available options and a list of supported algorithms.
+The first command you should run is `-h` to see all available options.
 
 ```bash
 perl criptofep.pl -h
+```
+
+**3. List Available Algorithms**
+To see a quick overview of all supported algorithms, use the list commands.
+
+```bash
+perl criptofep.pl --list-ciphers
+perl criptofep.pl --list-encodings
 ```
 
 -----
@@ -147,14 +181,20 @@ perl criptofep.pl -h
 
 ### Synopsis
 
-CriptoFEP operates in two distinct modes: **Cipher Mode** for encryption/decryption and **Encoding Mode** for standard mappings.
+CriptoFEP operates in three distinct modes: **Cipher**, **Encoding**, and **Analysis**.
 
 ```bash
-# Cipher Mode (for algorithms that hide information, usually with a key)
-perl criptofep.pl -c <cipher> [-e|-d] [options...] ["text" | --in <file>] [--out <file>]
+# Cipher Mode (for algorithms that hide information)
+perl criptofep.pl -c <cipher> [-e|-d] [options...] ["text" | --in <file>]
 
 # Encoding Mode (for standard, keyless representations)
-perl criptofep.pl -m <mapping> [--encode|--decode] ["text" | --in <file>] [--out <file>]
+perl criptofep.pl -m <mapping> [--encode|--decode] ["text" | --in <file>]
+
+# Analysis Mode (for cryptanalysis tools)
+perl criptofep.pl -a <tool> [--lang <lg>] ["text" | --in <file>]
+
+# Utility Mode (for helper tools)
+perl criptofep.pl --validate-key <cipher> <key>
 ```
 
 ### Command-Line Options
@@ -164,24 +204,30 @@ perl criptofep.pl -m <mapping> [--encode|--decode] ["text" | --in <file>] [--out
 | Option             | Description                                       |
 | ------------------ | ------------------------------------------------- |
 | `-h`, `--help`     | Display the full help message and exit.           |
+| `--list-ciphers`   | Display all ciphers                               |
+| `--list-encodings` | Display all encodings                             |
 | `--in <FILE>`      | Read input text from the specified file.          |
 | `--out <FILE>`     | Write the output to the specified file.           |
 
 #### **Mode Selection (Choose ONE)**
 
-| Option              | Description                                             |
-| ------------------- | --------------------------------------------------------|
-| `-c`, `--cipher <NAME>` | Selects **Cipher Mode** and specifies the cipher.   |
-| `-m`, `--mapping <NAME>`| Selects **Encoding Mode** and specifies the mapping.|
+| Option                  | Description                                                   |
+| ----------------------- | --------------------------------------------------------------|
+| `-c`, `--cipher <NAME>` | Selects **Cipher Mode** and specifies the cipher.             |
+| `-m`, `--mapping <NAME>`| Selects **Encoding Mode** and specifies the mapping.          |
+| `-a`, `--analyze <TOOL>`| Select **Analysis Mode** (e.g., `freq`, `ic`, `poly-detect`). |
+| `--validate-key <NAME>` |	Select Utility Mode to validate a key (e.g., hill).           |
 
 #### **Actions (Choose ONE per mode)**
 
-| Option      | Mode     | Description                       |
-| ----------- | -------- | --------------------------------- |
-| `-e`, `--encrypt` | Cipher   | Encrypt the input text.     |
-| `-d`, `--decrypt` | Cipher   | Decrypt the input text.     |
-| `-enc`,`--encode` | Encoding | Encode the input text.      |
-| `-dec`,`--decode` | Encoding | Decode the input text.      |
+| Option            | Description                                                         |
+| ----------------- | ------------------------------------------------------------------- |
+| `-e`, `--encrypt` | Cipher mode Encrypt the input text.                                 |
+| `-d`, `--decrypt` | Cipher mode Decrypt the input text.                                 |
+| `-enc`,`--encode` | Encoding mode Encode the input text.                                |
+| `-dec`,`--decode` | Encoding mode Decode the input text.                                |
+| `--info`          | Display detailed information about the selected algorithm.          |
+| `--lang <lg>`     | Specify the language profile for analysis (e.g., `en`, `pt`, `fr`). |
 
 #### **Cipher-Specific Keys**
 
@@ -192,31 +238,44 @@ perl criptofep.pl -m <mapping> [--encode|--decode] ["text" | --in <file>] [--out
 | `-k3`, `--key3 <KEY>` | Provide the third key (for 'threesquare').                           |
 | `--grid-key <KEY>`    | Provide the grid generation key (for `adfgx`, `adfgvx`).             |
 | `--pattern-key <VAL>` | Provide the pattern key (for `amsco`, e.g., "1221").                 |
+| `--date <DATE>`       | Provide the date (for 'vic' cipher).                                 |
 
 ### Practical Examples
 
-**1. Encrypt a string with the Affine cipher**
+**1. Encrypt with the VIC cipher**
 
 ```bash
-perl criptofep.pl -c affine -e -k "5,8" "This is a secret message"
+perl criptofep.pl -c vic -e -k "A SIN TO SIN" --date "171025" "ATTACK AT DAWN"
 ```
 
-**2. Decrypt a string with Double Columnar (requires two keys)**
+**2. Decode a Base64 string**
 
 ```bash
-perl criptofep.pl -c doublecolumnar -d -k "GERMAN" -k2 "SECRET" "TADWTNKA C TAA"
+perl criptofep.pl -m base64 --decode "SGVsbG8gV29ybGQ="
 ```
 
-**3. Encode a file's content using the NATO alphabet and save it to another file**
+**3. Analyze a ciphertext to find its key length**
+
+```bash
+perl criptofep.pl -a poly-detect --lang en "VPOVEWZTVMVIXRKSVIUGZGSVGIZBHOLYRZMZKKILEZXS"
+```
+
+**4. Check the Index of Coincidence of a text**
+
+```bash
+perl criptofep.pl -a ic "VPOVEWZTVMVIXRKSVIUGZGSVGIZBHOLYRZMZKKILEZXS"
+```
+
+**5. Encode a file's content using the NATO alphabet and save it to another file**
 
 ```bash
 perl criptofep.pl -m nato --encode --in message.txt --out nato_encoded.txt
 ```
 
-**4. Get detailed information about the historic ADFGVX cipher**
+**6. Get detailed information about the historic Playfair cipher**
 
 ```bash
-perl criptofep.pl -c adfgvx --info
+perl criptofep.pl -c playfair --info
 ```
 
 -----
@@ -224,21 +283,24 @@ perl criptofep.pl -c adfgvx --info
 ## 📂 Project Structure
 
 ```
-CriptoFEP/
+.
+├── 📜 criptofep.pl          # The main command-line interface (controller)
 │
-├── criptofep.pl          # Main command-line interface (the controller)
+├── 📂 lib/
+│   └── 📂 CriptoFEP/       # Directory for all Perl modules (the core logic)
+│       ├── 📜 Utils.pm     # Shared helper functions (e.g., text normalization)
+│       ├── 📜 Analyzer.pm  # The cryptanalysis module
+│       ├── 📜 Cesar.pm     # Each cipher has its own dedicated module...
+│       ├── 📜 Morse.pm     # Each encoding has its own dedicated module...
+│       └── ...           # ...and so on for all algorithms
 │
-├── lib/
-│   └── CriptoFEP/        # Directory containing all Perl modules
-│       ├── Utils.pm      # Shared helper functions (normalization, etc.)
-│       ├── Cesar.pm      # Each algorithm has its own dedicated module...
-│       └── ...
+├── 🔬 t/                   # Directory for the automated test suite
+│   ├── 📜 01-cesar.t     # Each module has a corresponding test file...
+│   └── ...
 │
-├── t/                    # Directory for automated tests (*.t files)
+├── 📄 README.md              # This documentation file
 │
-├── README.md             # This documentation file
-│
-└── LICENSE               # MIT License file
+└── ⚖️ LICENSE               # The MIT License for the project
 ```
 
 -----
@@ -247,11 +309,11 @@ CriptoFEP/
 
   - [x] Implement a comprehensive library of classic ciphers and encodings.
   - [x] Create a professional, modular architecture.
-  - [x] Add a robust command-line interface with file I/O.
-  - [ ] **Next Up**: Complete the automated test suite for all modules.
-  - [ ] Add more unique and challenging ciphers (e.g., Book Cipher, Turning Grille).
+  - [x] Add a robust command-line interface with file I/O and dynamic help.
+  - [x] Implement a powerful cryptanalysis suite (Freq Analysis, IC, Key Length Detector).
+  - [ ] **Next Up**: Complete the automated test suite to achieve 100% coverage.
+  - [ ] Add more unique and challenging ciphers (e.g., Book Cipher, Enigma).
   - [ ] Create a `LEIA-ME.md` file with a full Portuguese translation.
-  - [ ] Consider publishing the library on CPAN (the Comprehensive Perl Archive Network).
 
 -----
 
@@ -266,4 +328,3 @@ If you have a suggestion that would make this better, please fork the repo and c
 ## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-

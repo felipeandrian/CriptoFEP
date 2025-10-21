@@ -1,26 +1,25 @@
 #
 # CriptoFEP::Affine
 #
-# This module provides the implementation for the Affine cipher, a monoalphabetic
-# substitution cipher that uses a linear function for its mapping.
+# This module provides the implementation for the Affine cipher.
+# It is a mathematical substitution cipher using the formula (ax + b) mod 26.
+# This version has been refactored to use the central mod_inverse
+# function from CriptoFEP::Utils for decryption.
 #
-
 package CriptoFEP::Affine;
 
 # --- CORE PRAGMAS ---
 # Enforce modern Perl best practices for cleaner, safer code.
 use strict;
 use warnings;
-# Ensure that the source code can contain and process UTF-8 characters.
 use utf8;
 
-
 # --- MODULE IMPORTS ---
-# Add the parent 'lib' directory to Perl's search path to find our custom modules.
+# Add the parent 'lib' directory to Perl's search path.
 use lib 'lib';
-# Import shared utilities: text normalization and alphabet mappings from the Utils module.
-use CriptoFEP::Utils qw(normalize_text $alphabet_list_ref $alphabet_map_ref);
-
+# Import shared utilities: text normalization, alphabet mappings,
+# and now our new, centralized modular inverse function!
+use CriptoFEP::Utils qw(normalize_text $alphabet_list_ref $alphabet_map_ref mod_inverse);
 
 # --- EXPORTER CONFIGURATION ---
 # Standard Perl boilerplate to allow other scripts to import this module's functions.
@@ -28,67 +27,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 # Define which subroutines can be explicitly imported by other packages.
 our @EXPORT_OK = qw(affine_encrypt affine_decrypt info);
-
-
-# --- MODULE-PRIVATE HELPER SUBROUTINES ---
-
-=head2 _modInverse
- 
- Internal function to calculate the modular multiplicative inverse of 'a' modulo 'm'.
- This is essential for the decryption process.
- 
- B<Parameters:>
-   - $a (integer): The number to find the inverse of.
-   - $m (integer): The modulus.
- 
- B<Returns:>
-   - (integer|undef): The modular inverse if it exists, otherwise undef.
- 
-=cut
-sub _modInverse {
-    my ($a, $m) = @_;
-    $a = $a % $m;
-    # Brute-force search for the inverse 'x' such that (a * x) % m == 1.
-    # This is efficient enough for a small modulus like 26.
-    for my $x (1 .. $m - 1) {
-        return $x if (($a * $x) % $m == 1);
-    }
-    return undef; # Inverse does not exist (a and m are not coprime).
-}
-
-=head2 _parse_and_validate_key
- 
- Internal function to parse the key string "a,b" and validate its components.
- It ensures 'a' is a valid multiplier (coprime with 26).
- 
- B<Parameters:>
-   - $key (string): The key string, expected in "a,b" format.
- 
- B<Returns:>
-   - A list containing ($a, $b, $a_inverse) on success.
-   - The script will die with an error message on failure.
- 
-=cut
-sub _parse_and_validate_key {
-    my ($key) = @_;
-    
-    # Ensure the key matches the required "number,number" format.
-    unless ($key =~ /^(\d+),(\d+)$/) {
-        # This validation is also in criptofep.pl for a faster failure,
-        # but kept here for module robustness and independent testing.
-        die "ERROR: Invalid key format for Affine cipher. Expected 'a,b' (e.g., -k \"5,8\").\n";
-    }
-    my ($a, $b) = ($1, $2);
-
-    # Calculate the modular inverse of 'a' to check if it's a valid key.
-    my $a_inv = _modInverse($a, 26);
-    unless (defined $a_inv) {
-        die "ERROR: Invalid key 'a' for Affine cipher. 'a' value ($a) is not coprime with 26.\n";
-    }
-
-    return ($a, $b, $a_inv);
-}
-
 
 # --- PUBLIC CIPHER SUBROUTINES ---
 
@@ -98,27 +36,28 @@ sub _parse_and_validate_key {
  
  B<Parameters:>
    - $plaintext (string): The plaintext to be encrypted.
-   - $key (string): The key in "a,b" format (e.g., "5,8").
+   - $key_str (string): The key, formatted as "a,b".
  
  B<Returns:>
    - (string): The resulting ciphertext.
  
 =cut
 sub affine_encrypt {
-    my ($plaintext, $key) = @_;
-    # Parse and validate the key, getting 'a' and 'b'.
-    my ($a, $b) = _parse_and_validate_key($key);
+    my ($plaintext, $key_str) = @_;
+    # Parse the key string "a,b" into its two integer components.
+    my ($a, $b) = split /,/, $key_str;
     
     my $norm_plain = normalize_text($plaintext);
     my $ciphertext = "";
 
+    # Iterate over each character of the normalized text.
     foreach my $char (split //, $norm_plain) {
-        # Convert character to numeric value (A=0, B=1...).
-        my $x = $alphabet_map_ref->{$char};
-        # Apply encryption formula: E(x) = (a*x + b) mod 26.
-        my $e_x = ($a * $x + $b) % 26;
-        # Convert numeric value back to a character.
-        $ciphertext .= $alphabet_list_ref->[$e_x];
+        # Get the numeric index of the character (e.g., 'A' -> 0).
+        my $p_idx = $alphabet_map_ref->{$char};
+        # Apply the Affine encryption formula: E(p) = (a*p + b) mod 26.
+        my $c_idx = ($a * $p_idx + $b) % 26;
+        # Convert the new index back to a letter.
+        $ciphertext .= $alphabet_list_ref->[$c_idx];
     }
     return $ciphertext;
 }
@@ -129,28 +68,36 @@ sub affine_encrypt {
  
  B<Parameters:>
    - $ciphertext (string): The ciphertext to be decrypted.
-   - $key (string): The key in "a,b" format used for encryption.
+   - $key_str (string): The key ("a,b") used for the original encryption.
  
  B<Returns:>
    - (string): The original plaintext.
  
 =cut
 sub affine_decrypt {
-    my ($ciphertext, $key) = @_;
-    # Parse and validate the key, getting 'a', 'b', and the pre-calculated inverse of 'a'.
-    my ($a, $b, $a_inv) = _parse_and_validate_key($key);
+    my ($ciphertext, $key_str) = @_;
+    my ($a, $b) = split /,/, $key_str;
     
+    # --- THE CRITICAL STEP ---
+    # Instead of a brute-force loop, we now use our professional math tool
+    # to find the modular multiplicative inverse of 'a'.
+    my $a_inv = mod_inverse($a, 26);
+    # This 'die' is a crucial security and stability check.
+    # If no inverse exists, decryption is impossible, and we stop.
+    die "Invalid 'a' key: $a has no modular inverse mod 26.\n" unless defined $a_inv;
+
     my $norm_cipher = normalize_text($ciphertext);
     my $plaintext = "";
 
+    # Iterate over each character of the normalized ciphertext.
     foreach my $char (split //, $norm_cipher) {
-        # Convert character to numeric value (A=0, B=1...).
-        my $y = $alphabet_map_ref->{$char};
-        # Apply decryption formula: D(y) = a⁻¹ * (y - b) mod 26.
-        # Add 26 to (y - b) to prevent negative results from the modulo operation.
-        my $d_y = ($a_inv * ($y - $b + 26)) % 26;
-        # Convert numeric value back to a character.
-        $plaintext .= $alphabet_list_ref->[$d_y];
+        # Get the numeric index of the character (e.g., 'C' -> 2).
+        my $c_idx = $alphabet_map_ref->{$char};
+        # Apply the Affine decryption formula: D(c) = a_inv * (c - b) mod 26.
+        # Adding 26 before the modulo handles potential negative results.
+        my $p_idx = ($a_inv * ($c_idx - $b + 26)) % 26;
+        # Convert the original index back to a letter.
+        $plaintext .= $alphabet_list_ref->[$p_idx];
     }
     return $plaintext;
 }
