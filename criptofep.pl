@@ -62,6 +62,7 @@ use CriptoFEP::VigenereStandard qw(vigenere_standard_encrypt vigenere_standard_d
 use CriptoFEP::Digrafid qw(digrafid_encrypt digrafid_decrypt);
 use CriptoFEP::Morbit qw(morbit_encrypt morbit_decrypt);
 use CriptoFEP::Affine qw(affine_encrypt affine_decrypt);
+use CriptoFEP::Beaufort qw(beaufort_cipher);
 # Encodings (Systems for representing information, no secret key required)
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -122,6 +123,7 @@ my %ciphers = (
     'vigenere' => { encrypt => \&vigenere_standard_encrypt, decrypt => \&vigenere_standard_decrypt, needs_key => 1, info => \&CriptoFEP::VigenereStandard::info },
 	'digrafid' => { encrypt => \&digrafid_encrypt, decrypt => \&digrafid_decrypt, needs_key => 1, info => \&CriptoFEP::Digrafid::info },
 	'morbit' => { encrypt => \&morbit_encrypt, decrypt => \&morbit_decrypt, needs_key => 0, info => \&CriptoFEP::Morbit::info },
+	'beaufort' => { encrypt => \&beaufort_cipher, decrypt => \&beaufort_cipher, needs_key => 1, info => \&CriptoFEP::Beaufort::info },	
 );
 # --- ENCODING DATA STRUCTURE ---
 # A similar dispatch table for all supported encodings.

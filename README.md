@@ -78,6 +78,7 @@ This is the complete list of algorithms and tools currently supported by CriptoF
 | **Atbah**          |      No       | A simple substitution cipher with a specific, non-sequential mapping.      |
 | **Atbash**         |      No       | A simple substitution cipher that reverses the alphabet (A=Z, B=Y...).     |
 | **Bacon**          |      No       | A 5-bit binary encoding that maps letters to sequences of 'A's and 'B's.   |
+| **Beaufort**       |      Yes      | A reciprocal polyalphabetic cipher, similar to Vigenere (C = K - P).       |
 | **Bifid**          |      Yes      | A fractionating cipher combining Polybius with transposition.              |
 | **Caesar**         |      No       | The classic shift cipher (fixed shift of 3).                               |
 | **Caesar Box**     |      Yes      | A simple columnar transposition where columns are read in natural order.   |
