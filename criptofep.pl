@@ -344,31 +344,36 @@ elsif (defined $validate_key_cipher) {
     exit 0;
 }
 
+# --- ANALYSIS MODE ---
 elsif (defined $analyze_flag) {
     
-    # --- CORREÇÃO: LÓGICA DE ENTRADA UNIFICADA ---
     my $text_input;
     if (defined $file_in) {
         open my $fh, '<', $file_in or die "ERROR: Could not open input file '$file_in': $!\n";
         read $fh, $text_input, -s $fh; close $fh;
-		chomp($text_input);
+        chomp($text_input); 
         print "Read from file: '$file_in'\n";
     } else {
         $text_input = shift @ARGV;
     }
     die "ERROR: No input text provided for analysis.\n" unless defined $text_input;
     $text_input = decode('UTF-8', $text_input) unless defined $file_in;
-    # --- FIM DA CORREÇÃO ---
+    # --- Fim da Lógica de Entrada ---
     
     my $analysis_result;
+    my $command_info = "Analysis: $analyze_flag";
+    
     if ($analyze_flag eq 'freq') {
         $analysis_result = analyze_frequency($text_input, $lang_input);
+        $command_info .= ", Language: " . ($lang_input // 'pt');
     }
     elsif ($analyze_flag eq 'ic') {
         $analysis_result = analyze_ic($text_input, $lang_input);
+        $command_info .= ", Language: " . ($lang_input // 'pt');
     }
     elsif ($analyze_flag eq 'poly-detect') {
         $analysis_result = find_key_length($text_input, $lang_input);
+        $command_info .= ", Language: " . ($lang_input // 'pt');
     }
     elsif ($analyze_flag eq 'digram') {
         $analysis_result = analyze_ngrams($text_input, 2);
@@ -380,12 +385,24 @@ elsif (defined $analyze_flag) {
         die "ERROR: The 'poly-solve' analysis requires a key length (ex: --klen 5).\n" 
             unless defined $klen_input;
         $analysis_result = poly_solve($text_input, $klen_input, $lang_input);
+        $command_info .= ", KeyLength: $klen_input, Language: " . ($lang_input // 'pt');
     }
     else {
         die "ERROR: Unknown analysis type '$analyze_flag'. Supported: 'freq', 'ic', 'poly-detect', 'digram', 'trigram', 'poly-solve'.\n";
     }
-    print $analysis_result;
+    
+    print "$command_info\n";
+    
+    if (defined $file_out) {
+        open my $fh, '>', $file_out or die "ERROR: Could not write to output file '$file_out': $!\n";
+        print $fh $analysis_result; # Escreve o relatório completo no ficheiro
+        close $fh;
+        print "Analysis report successfully saved to '$file_out'.\n\n";
+    } else {
+        print $analysis_result; 
+    }
     exit 0;
+    # --- FIM DA CORREÇÃO ---
 }
 
 # --- INFO MODE ---
