@@ -64,6 +64,7 @@ use CriptoFEP::Morbit qw(morbit_encrypt morbit_decrypt);
 use CriptoFEP::Affine qw(affine_encrypt affine_decrypt);
 use CriptoFEP::Beaufort qw(beaufort_cipher);
 use CriptoFEP::Hill qw(hill_encrypt hill_decrypt hill_validate_key);
+use CriptoFEP::Grandpre qw(grandpre_encrypt grandpre_decrypt);
 # Encodings (Systems for representing information, no secret key required)
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -126,6 +127,7 @@ my %ciphers = (
 	'morbit' => { encrypt => \&morbit_encrypt, decrypt => \&morbit_decrypt, needs_key => 0, info => \&CriptoFEP::Morbit::info },
 	'beaufort' => { encrypt => \&beaufort_cipher, decrypt => \&beaufort_cipher, needs_key => 1, info => \&CriptoFEP::Beaufort::info },	
 	'hill' => { encrypt => \&hill_encrypt, decrypt => \&hill_decrypt, needs_key => 1, info => \&CriptoFEP::Hill::info },
+	'grandpre' => { encrypt => \&grandpre_encrypt, decrypt => \&grandpre_decrypt, needs_key => 1, info => \&CriptoFEP::Grandpre::info },
 );
 # --- ENCODING DATA STRUCTURE ---
 # A similar dispatch table for all supported encodings.
@@ -476,7 +478,7 @@ if ($cipher_name) {
         $final_result = $function_ref->($text_input, [$key_input, $date_input]);
         $command_info .= ", Phrase: \"$key_input\", Date: \"$date_input\"";
     }
-    elsif ($cipher_name eq 'doublecolumnar' || $cipher_name eq 'twosquare' || $cipher_name eq 'foursquare') {
+    elsif ($cipher_name eq 'doublecolumnar' || $cipher_name eq 'twosquare' || $cipher_name eq 'foursquare' || $cipher_name eq 'grandpre') {
         die "ERROR: The '$cipher_name' cipher requires a primary key (-k) and a second key (--key2).\n" 
             unless defined $key_input && defined $key2_input;
         # Pass both keys as an array reference.

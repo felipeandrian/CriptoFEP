@@ -48,7 +48,7 @@
 
 ## ✨ Core Features
 
-- **Extensive Library**: A vast collection of over 30 classic ciphers and 15+ standard encodings.
+- **Extensive Library**: A vast collection of over 40 classic ciphers and 15+ standard encodings.
 - **Triple Modes**: Intelligently separates **Ciphers** (secrecy), **Encodings** (representation), and **Analysis** (cryptanalysis).
 - **Cryptanalysis Suite**: Includes tools like Frequency Analysis, Index of Coincidence (IC), and a Polyalphabetic Key Length Detector.
 - **Professional CLI**: A robust and intuitive command-line interface with clear, consistent options.
@@ -86,6 +86,7 @@ This is the complete list of algorithms and tools currently supported by CriptoF
 | **Digrafid**       |      Yes      | An advanced fractionating cipher operating on digraphs with a 25x25 grid.  |
 | **Double Columnar**|      Yes      | Applies the Columnar Transposition cipher twice for enhanced security.     |
 | **Four-Square**    |      Yes      | A polygraphic cipher using four 5x5 grids to encrypt digraphs.             |
+| **Grandpré**       |      Yes      | A progressive-key polyalphabetic cipher (stronger Vigenere).               |
 | **Hill**           |      Yes      | A polygraphic cipher using linear algebra (matrix multiplication).         |
 | **Keyboard Shift** |      No       | A substitution cipher based on shifting keys on a QWERTY keyboard.         |
 | **Morbit**         |      No       | A fractionating cipher that combines Morse code with a simple 3x3 grid.    |
