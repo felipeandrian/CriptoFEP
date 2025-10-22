@@ -104,6 +104,7 @@ This is the complete list of algorithms and tools currently supported by CriptoF
 | **Skip**           |      Yes      | A simple transposition equivalent to a Caesar Box or basic Columnar.       |
 | **Three-Square**   |      Yes      | A polygraphic cipher using three 5x5 grids.                                |
 | **Trifid**         |      Yes      | An advanced fractionating cipher using a 3x3x3 cube.                       |
+| **Trithemius**     |      No       | The first documented polyalphabetic cipher (progressive Caesar shift).     |
 | **Turning Grille** |      No       | A transposition cipher using a rotating stencil with a fixed 6x6 grid.     |
 | **Two-Square**     |      Yes      | A polygraphic cipher using two 5x5 grids.                                  |
 | **VIC**            |      Yes      | A highly complex Cold War spy cipher.                                      |

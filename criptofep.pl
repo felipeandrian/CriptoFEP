@@ -65,7 +65,8 @@ use CriptoFEP::Affine qw(affine_encrypt affine_decrypt);
 use CriptoFEP::Beaufort qw(beaufort_cipher);
 use CriptoFEP::Hill qw(hill_encrypt hill_decrypt hill_validate_key);
 use CriptoFEP::Grandpre qw(grandpre_encrypt grandpre_decrypt);
-use CriptoFEP::Porta qw(porta_cipher info);
+use CriptoFEP::Porta qw(porta_cipher);
+use CriptoFEP::Trithemius qw(trithemius_encrypt trithemius_decrypt);
 # Encodings (Systems for representing information, no secret key required)
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -130,6 +131,7 @@ my %ciphers = (
 	'hill' => { encrypt => \&hill_encrypt, decrypt => \&hill_decrypt, needs_key => 1, info => \&CriptoFEP::Hill::info },
 	'grandpre' => { encrypt => \&grandpre_encrypt, decrypt => \&grandpre_decrypt, needs_key => 1, info => \&CriptoFEP::Grandpre::info },
 	'porta' => { encrypt => \&porta_cipher,  decrypt => \&porta_cipher, needs_key => 1, info => \&CriptoFEP::Porta::info },
+	'trithemius' => { encrypt => \&trithemius_encrypt, decrypt => \&trithemius_decrypt, needs_key => 0, info => \&CriptoFEP::Trithemius::info },
 	
 );
 # --- ENCODING DATA STRUCTURE ---
