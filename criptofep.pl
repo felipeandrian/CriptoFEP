@@ -65,6 +65,7 @@ use CriptoFEP::Affine qw(affine_encrypt affine_decrypt);
 use CriptoFEP::Beaufort qw(beaufort_cipher);
 use CriptoFEP::Hill qw(hill_encrypt hill_decrypt hill_validate_key);
 use CriptoFEP::Grandpre qw(grandpre_encrypt grandpre_decrypt);
+use CriptoFEP::Porta qw(porta_cipher info);
 # Encodings (Systems for representing information, no secret key required)
 use CriptoFEP::Morse qw(morse_encode morse_decode);
 use CriptoFEP::A1Z26 qw(a1z26_encode a1z26_decode);
@@ -128,6 +129,8 @@ my %ciphers = (
 	'beaufort' => { encrypt => \&beaufort_cipher, decrypt => \&beaufort_cipher, needs_key => 1, info => \&CriptoFEP::Beaufort::info },	
 	'hill' => { encrypt => \&hill_encrypt, decrypt => \&hill_decrypt, needs_key => 1, info => \&CriptoFEP::Hill::info },
 	'grandpre' => { encrypt => \&grandpre_encrypt, decrypt => \&grandpre_decrypt, needs_key => 1, info => \&CriptoFEP::Grandpre::info },
+	'porta' => { encrypt => \&porta_cipher,  decrypt => \&porta_cipher, needs_key => 1, info => \&CriptoFEP::Porta::info },
+	
 );
 # --- ENCODING DATA STRUCTURE ---
 # A similar dispatch table for all supported encodings.

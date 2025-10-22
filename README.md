@@ -64,7 +64,7 @@
 This is the complete list of algorithms and tools currently supported by CriptoFEP.
 
 <details>
-<summary><strong>Click to expand the full list of 30+ Ciphers</strong></summary>
+<summary><strong>Click to expand the full list of 40+ Ciphers</strong></summary>
 
 ### Ciphers (Algorithms for confidentiality)
 
@@ -94,6 +94,7 @@ This is the complete list of algorithms and tools currently supported by CriptoF
 | **Nihilist**       |      Yes      | A superencipherment combining a Polybius square with a key addition.       |
 | **Playfair**       |      Yes      | The first practical polygraphic substitution cipher, using one 5x5 grid.   |
 | **Pollux**         |      Yes      | A homophonic cipher that disguises Morse code using a numeric key.         |
+| **Porta**          |      Yes      | A reciprocal polyalphabetic cipher using 13 substitution tables.           |
 | **Rail Fence**     |      Yes      | A transposition cipher that writes text in a zig-zag pattern.              |
 | **Redefence**      |      Yes      | A route cipher that writes text column-by-column and reads row-by-row.     |
 | **ROT13**          |      No       | A Caesar cipher with a fixed shift of 13.                                  |
